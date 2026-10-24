@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1120" role="img" aria-labelledby="title desc">
+  <title id="title">ゲームプレイ用パチンコ盤面</title>
+  <desc id="desc">金属と透明樹脂の多層フレーム、大型液晶、右側ボーナス表示、盤面の釘、玉の通路、始動口、下部表示で構成した盤面</desc>
+  <defs>
+    <linearGradient id="shell" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#090d12"/><stop offset=".22" stop-color="#57616a"/><stop offset=".34" stop-color="#10151a"/><stop offset=".54" stop-color="#87929a"/><stop offset=".68" stop-color="#15191e"/><stop offset=".86" stop-color="#56616a"/><stop offset="1" stop-color="#080b0f"/></linearGradient>
+    <linearGradient id="glass" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#d9f7ff" stop-opacity=".82"/><stop offset=".2" stop-color="#8de9f0" stop-opacity=".14"/><stop offset=".55" stop-color="#fff" stop-opacity=".05"/><stop offset=".85" stop-color="#e1fbff" stop-opacity=".43"/><stop offset="1" stop-color="#fff" stop-opacity=".11"/></linearGradient>
+    <linearGradient id="screen" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#062538"/><stop offset=".48" stop-color="#087d9f"/><stop offset="1" stop-color="#06111c"/></linearGradient>
+    <linearGradient id="cyan" x1="0" x2="1"><stop stop-color="#0ff"/><stop offset=".5" stop-color="#36e9ff"/><stop offset="1" stop-color="#087ec2"/></linearGradient>
+    <linearGradient id="gold" x1="0" x2="1"><stop stop-color="#7b4507"/><stop offset=".4" stop-color="#ffe27a"/><stop offset=".7" stop-color="#e99a14"/><stop offset="1" stop-color="#603507"/></linearGradient>
+    <linearGradient id="bonus" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#f52d2d"/><stop offset="1" stop-color="#550b16"/></linearGradient>
+    <pattern id="pins" width="31" height="38" patternUnits="userSpaceOnUse"><circle cx="15" cy="17" r="6" fill="#4b2d0c"/><circle cx="14" cy="15" r="5" fill="url(#gold)" stroke="#fff1a5" stroke-width="1.2"/><circle cx="12.5" cy="13.5" r="1.4" fill="#fff8ce"/></pattern>
+    <pattern id="mesh" width="18" height="18" patternUnits="userSpaceOnUse"><path d="M0 9L9 0l9 9-9 9z" fill="none" stroke="#11dff1" stroke-opacity=".18" stroke-width="1"/></pattern>
+    <filter id="glow"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <clipPath id="boardClip"><path d="M400 25C292 25 192 52 125 120 61 186 34 266 27 367v465c10 111 87 208 206 259 51 22 109 33 167 33s116-11 167-33c119-51 196-148 206-259V367c-7-101-34-181-98-247C608 52 508 25 400 25Z"/></clipPath>
+  </defs>
+
+  <!-- Heavy rounded cabinet shell -->
+  <path d="M400 13C282 13 178 42 107 115 42 181 18 267 15 368v469c8 128 93 232 223 287 49 21 105 32 162 32s113-11 162-32c130-55 215-159 223-287V368c-3-101-27-187-92-253C622 42 518 13 400 13Z" fill="#05070a" stroke="#171c21" stroke-width="18"/>
+  <path d="M400 24C289 24 188 51 119 122 58 186 32 268 28 368v466c10 118 90 214 212 266 48 20 103 31 160 31s112-11 160-31c122-52 202-148 212-266V368c-4-100-30-182-91-246C612 51 511 24 400 24Z" fill="url(#shell)" stroke="#879199" stroke-width="7"/>
+  <path d="M400 43C297 43 204 68 141 132 81 193 55 274 52 370v453c12 104 82 190 194 237 46 19 98 29 154 29s108-10 154-29c112-47 182-133 194-237V370c-3-96-29-177-89-238C596 68 503 43 400 43Z" fill="#080c11" stroke="#171e24" stroke-width="15"/>
+  <g clip-path="url(#boardClip)">
+    <rect x="20" y="20" width="760" height="1080" fill="#080c11"/>
+
+    <!-- Upper arched pin gallery -->
+    <path d="M113 334Q106 186 223 113Q400 24 577 113Q694 186 687 334L633 375H167Z" fill="#10171d" stroke="#7c8990" stroke-width="11"/>
+    <path d="M126 315Q132 194 239 131Q400 48 561 131Q668 194 674 315L617 353H183Z" fill="url(#pins)" stroke="#273139" stroke-width="7"/>
+    <path d="M145 296Q158 205 252 151Q400 75 548 151Q642 205 655 296" fill="none" stroke="#c3d0d5" stroke-width="15" opacity=".8"/>
+    <path d="M147 294Q162 204 254 154Q400 80 546 154Q638 204 653 294" fill="none" stroke="url(#glass)" stroke-width="9"/>
+    <path d="M202 331Q235 274 274 276H526Q565 274 598 331" fill="none" stroke="#a7b3b9" stroke-width="24" stroke-linecap="round"/>
+    <path d="M202 327Q235 271 274 273H526Q565 271 598 327" fill="none" stroke="url(#glass)" stroke-width="13" stroke-linecap="round"/>
+    <g fill="#10161c" stroke="#acb9bd" stroke-width="5"><circle cx="195" cy="276" r="31"/><circle cx="277" cy="322" r="25"/><circle cx="523" cy="322" r="25"/><circle cx="605" cy="276" r="31"/></g>
+    <g fill="#ffbd30" stroke="#fff0a2" stroke-width="2"><circle cx="194" cy="275" r="8"/><circle cx="277" cy="321" r="7"/><circle cx="523" cy="321" r="7"/><circle cx="606" cy="275" r="8"/></g>
+    <path d="M230 345H570" stroke="url(#cyan)" stroke-width="8" filter="url(#glow)"/>
+
+    <!-- Transparent guard rails wrap around the LCD -->
+    <path d="M54 505Q74 370 139 340L164 359Q116 421 112 535L110 726Q116 822 201 890" fill="none" stroke="#95a3aa" stroke-width="35" stroke-linecap="round"/>
+    <path d="M54 505Q74 370 139 340L164 359Q116 421 112 535L110 726Q116 822 201 890" fill="none" stroke="url(#glass)" stroke-width="23" stroke-linecap="round"/>
+    <path d="M746 505Q726 370 661 340L636 359Q684 421 688 535L690 726Q684 822 599 890" fill="none" stroke="#95a3aa" stroke-width="35" stroke-linecap="round"/>
+    <path d="M746 505Q726 370 661 340L636 359Q684 421 688 535L690 726Q684 822 599 890" fill="none" stroke="url(#glass)" stroke-width="23" stroke-linecap="round"/>
+
+    <!-- Main liquid crystal, with an original neon city scene -->
+    <rect x="105" y="352" width="590" height="414" rx="22" fill="#06090d" stroke="#89969d" stroke-width="18"/>
+    <rect x="119" y="366" width="562" height="386" rx="11" fill="url(#screen)" stroke="#d4e3e8" stroke-width="7"/>
+    <path d="M120 615L179 563 209 579 252 496 284 558 326 469 359 547 398 451 433 555 480 488 519 571 563 500 597 565 640 481 681 558V752H120Z" fill="#07141e"/>
+    <path d="M120 657L174 614 214 629 264 569 301 616 343 545 385 615 430 533 464 608 510 562 550 624 598 550 641 617 681 572V752H120Z" fill="#061018"/>
+    <g fill="#19dff5" opacity=".95"><path d="M184 558h10v62h-10zM205 544h7v77h-7zM267 571h10v50h-10zM331 519h11v103h-11zM391 531h8v87h-8zM453 557h11v66h-11zM514 578h8v45h-8zM580 549h11v72h-11z"/></g>
+    <g fill="#ff9637"><path d="M239 583h6v38h-6zM297 549h7v71h-7zM420 574h6v48h-6zM488 552h7v68h-7zM550 590h6v31h-6z"/></g>
+    <path d="M150 701H650" stroke="#21f4ef" stroke-width="5" opacity=".9" filter="url(#glow)"/>
+    <path d="M204 696L354 396 494 697" fill="none" stroke="#24ddfb" stroke-width="5" opacity=".55"/>
+    <circle cx="400" cy="488" r="58" fill="#062332" stroke="#1ce6ee" stroke-width="4" filter="url(#glow)"/>
+    <path d="M378 503Q400 465 426 455Q419 485 389 514Q409 508 429 489Q417 525 377 530Z" fill="#d8ffff" stroke="#13e5f2" stroke-width="4"/>
+    <g fill="#f5fbff" opacity=".7"><circle cx="171" cy="405" r="2"/><circle cx="245" cy="431" r="2"/><circle cx="529" cy="416" r="2"/><circle cx="612" cy="456" r="2"/><circle cx="559" cy="690" r="2"/><circle cx="286" cy="684" r="2"/></g>
+
+    <!-- Bonus status panel on the right -->
+    <path d="M622 400H704V633H622Z" fill="#080a0e" stroke="#727d83" stroke-width="10"/>
+    <path d="M632 412H694V617H632Z" fill="url(#bonus)" stroke="#fb5a43" stroke-width="3"/>
+    <text x="663" y="444" text-anchor="middle" fill="#fff" font-family="sans-serif" font-weight="700" font-size="16">BONUS</text>
+    <g fill="#ffe0b9"><circle cx="643" cy="484" r="5"/><circle cx="655" cy="478" r="5"/><circle cx="667" cy="476" r="5"/><circle cx="679" cy="478" r="5"/><circle cx="691" cy="484" r="5"/></g>
+    <path d="M647 567Q663 526 682 512Q676 543 654 570Q672 562 686 545Q676 578 646 582Z" fill="#caffff" stroke="#18eaff" stroke-width="4" filter="url(#glow)"/>
+
+    <!-- Lower nail field and winding ball route -->
+    <path d="M118 770Q205 799 293 837L354 879 401 879 467 837Q550 800 682 770V928Q620 966 540 1002H260Q178 970 118 928Z" fill="#0b1116" stroke="#777f84" stroke-width="13"/>
+    <path d="M133 787Q225 821 308 859L358 898 401 898 456 859Q550 821 667 787V917Q607 951 534 984H267Q194 949 133 917Z" fill="url(#pins)" opacity=".95"/>
+    <path d="M93 740Q127 814 204 860L313 923Q354 947 389 966" fill="none" stroke="#7a858c" stroke-width="25" stroke-linecap="round"/>
+    <path d="M93 740Q127 814 204 860L313 923Q354 947 389 966" fill="none" stroke="url(#glass)" stroke-width="15" stroke-linecap="round"/>
+    <path d="M692 736Q677 825 623 875L539 939" fill="none" stroke="#7a858c" stroke-width="23" stroke-linecap="round"/>
+    <path d="M692 736Q677 825 623 875L539 939" fill="none" stroke="url(#glass)" stroke-width="13" stroke-linecap="round"/>
+
+    <!-- Lower-right information window -->
+    <path d="M526 825L676 790V936L543 977L509 943Z" fill="#071017" stroke="#7d8a91" stroke-width="10"/>
+    <path d="M541 840L661 812V921L552 955L529 937Z" fill="url(#mesh)" stroke="#0fe3f2" stroke-width="4"/>
+    <path d="M559 907Q594 855 637 837Q623 884 577 921Q614 908 650 875Q631 931 559 940Z" fill="#27efff" opacity=".9" filter="url(#glow)"/>
+
+    <!-- Start opening and illuminated lower display -->
+    <circle cx="400" cy="959" r="46" fill="#12181d" stroke="#e5a242" stroke-width="9"/>
+    <circle cx="400" cy="959" r="31" fill="#061018" stroke="#ff5138" stroke-width="4"/>
+    <path d="M385 969Q401 937 422 930Q416 953 389 975Q407 970 425 954Q416 985 384 988Z" fill="#d9ffff" stroke="#19e8f2" stroke-width="4"/>
+    <path d="M247 982Q263 958 285 963H515Q537 958 553 982L567 1038Q558 1065 530 1070H270Q242 1065 233 1038Z" fill="#080b0f" stroke="#89959b" stroke-width="13"/>
+    <path d="M262 989H538L547 1038H253Z" fill="#050809" stroke="#d7e8ed" stroke-width="6"/>
+    <g font-family="monospace" font-weight="bold" font-size="44" text-anchor="middle"><text x="303" y="1032" fill="#27ff9a" filter="url(#glow)">8</text><text x="366" y="1032" fill="#f9e347" filter="url(#glow)">8</text><text x="430" y="1032" fill="#ff455b" filter="url(#glow)">8</text><text x="493" y="1032" fill="#eb51ff" filter="url(#glow)">8</text></g>
+  </g>
+
+  <!-- Bolts and luminous edge strips -->
+  <path d="M32 535V776M768 535V776" stroke="url(#cyan)" stroke-width="7" filter="url(#glow)"/>
+  <g fill="#15212a" stroke="#c3cdd1" stroke-width="4"><circle cx="56" cy="180" r="13"/><circle cx="744" cy="180" r="13"/><circle cx="48" cy="886" r="13"/><circle cx="752" cy="886" r="13"/><circle cx="171" cy="1060" r="12"/><circle cx="629" cy="1060" r="12"/></g>
+  <g fill="#fff"><circle cx="52" cy="176" r="3"/><circle cx="740" cy="176" r="3"/><circle cx="44" cy="882" r="3"/><circle cx="748" cy="882" r="3"/></g>
+</svg>

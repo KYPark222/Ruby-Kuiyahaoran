@@ -1,0 +1,48 @@
+<main class="cabinet-shell">
+  <header class="topbar">
+    <div class="brand-lockup"><span class="brand-mark">玉</span><div><p class="eyebrow">PACHINKO LAB / STEP 01</p><h1>ORBIT <span>遊技シミュレーター</span></h1></div></div>
+    <div class="session-chip"><span class="status-dot"></span> SESSION ONLY <span class="chip-divider">|</span> DEMO SCREEN</div>
+  </header>
+
+  <section class="machine-stage" aria-label="パチンコ台の画面プレビュー">
+    <aside class="side-rail left-rail">
+      <div class="rail-label">PLAY DATA</div>
+      <div class="counter-card"><span>手持ち玉</span><strong>0<small>玉</small></strong></div>
+      <div class="counter-card"><span>投資</span><strong>0<small>円</small></strong></div>
+      <div class="counter-card"><span>収支</span><strong class="neutral">±0<small>円</small></strong></div>
+      <div class="rail-note"><span class="note-icon">i</span><p>カウンターは画面レイアウト確認用の仮表示です。</p></div>
+    </aside>
+
+    <section class="machine-cabinet gameplay-machine" aria-label="ゲームプレイ用パチンコ盤面">
+      <div class="game-board-wrap">
+        <%= image_tag "pachinko-board.png", alt: "液晶、BONUS表示、遊技釘、玉の通路、始動口、下部表示を備えたパチンコ盤面", class: "game-board-image" %>
+        <span class="board-callout callout-lcd">液晶</span>
+        <span class="board-callout callout-bonus">BONUS表示</span>
+        <span class="board-callout callout-pins">遊技釘</span>
+        <span class="board-callout callout-route">玉の通路</span>
+        <span class="board-callout callout-start">始動口</span>
+        <span class="board-callout callout-lower">下部表示</span>
+      </div>
+      <div class="game-control-bar" aria-label="ゲームプレイ操作">
+        <div class="power-setting">
+          <label for="launch-power">発射強度</label>
+          <input id="launch-power" type="range" min="0" max="100" value="62" aria-describedby="power-readout">
+          <output id="power-readout" for="launch-power">62%</output>
+        </div>
+        <div class="run-indicator" aria-live="polite"><span>遊技状態</span><strong id="run-state">停止中</strong></div>
+        <button id="launch-toggle" class="game-launch-button" type="button" aria-pressed="false">打ち出し開始</button>
+      </div>
+      <p class="gameplay-note">操作UIプレビュー — 玉の物理演算・抽選・出玉計算は未接続</p>
+    </section>
+
+    <aside class="side-rail right-rail">
+      <div class="rail-label">STATUS</div>
+      <div class="status-card"><span class="status-icon">◇</span><div><small>遊技状態</small><strong id="mode-status">停止中</strong></div></div>
+      <div class="status-card"><span class="status-icon">▦</span><div><small>保留</small><strong class="hold-lights"><i></i><i></i><i></i><i></i></strong></div></div>
+      <div class="status-card"><span class="status-icon">◉</span><div><small>回転数</small><strong>—</strong></div></div>
+      <div class="instruction-card"><span class="instruction-kicker">NEXT STEP</span><p>次の段階で盤面に玉の動きと抽選処理を追加します。</p><span class="progress-track"><i></i></span></div>
+    </aside>
+  </section>
+
+  <footer class="page-footer"><span>ORBIT — GAME PLAY UI</span><span>発射操作の表示のみ。玉の動き・抽選・払出は未接続です。</span></footer>
+</main>
