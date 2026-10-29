@@ -1,48 +1,118 @@
-<main class="cabinet-shell">
-  <header class="topbar">
-    <div class="brand-lockup"><span class="brand-mark">玉</span><div><p class="eyebrow">PACHINKO LAB / STEP 01</p><h1>ORBIT <span>遊技シミュレーター</span></h1></div></div>
-    <div class="session-chip"><span class="status-dot"></span> SESSION ONLY <span class="chip-divider">|</span> DEMO SCREEN</div>
+<main class="simulator-shell">
+  <header class="simulator-header">
+    <div class="brand-lockup">
+      <span class="brand-mark" aria-hidden="true">玉</span>
+      <div>
+        <p class="eyebrow">PACHINKO LAB / STEP 02</p>
+        <h1>ORBIT <span>遊技シミュレーター</span></h1>
+      </div>
+    </div>
+    <div class="session-chip"><span class="status-dot"></span> SESSION ONLY <span class="chip-divider">|</span> SAMPLE DATA</div>
   </header>
 
-  <section class="machine-stage" aria-label="パチンコ台の画面プレビュー">
-    <aside class="side-rail left-rail">
-      <div class="rail-label">PLAY DATA</div>
-      <div class="counter-card"><span>手持ち玉</span><strong>0<small>玉</small></strong></div>
-      <div class="counter-card"><span>投資</span><strong>0<small>円</small></strong></div>
-      <div class="counter-card"><span>収支</span><strong class="neutral">±0<small>円</small></strong></div>
-      <div class="rail-note"><span class="note-icon">i</span><p>カウンターは画面レイアウト確認用の仮表示です。</p></div>
+  <div class="game-layout">
+    <aside class="data-sidebar" aria-label="遊技情報">
+      <section class="data-panel balance-panel">
+        <header class="panel-heading"><div><span class="panel-kicker">PLAY DATA</span><h2>遊技情報</h2></div><span class="sample-tag">SAMPLE</span></header>
+        <div class="main-balance"><span>現在の持ち玉</span><strong>4,250<small>玉</small></strong></div>
+        <dl class="money-grid">
+          <div><dt>投資額</dt><dd>¥3,000</dd></div>
+          <div><dt>累計払出</dt><dd>1,240<small>玉</small></dd></div>
+          <div><dt>差玉</dt><dd class="positive">+1,240<small>玉</small></dd></div>
+          <div><dt>収支</dt><dd class="negative">−¥1,760</dd></div>
+        </dl>
+      </section>
+
+      <section class="data-panel session-panel">
+        <header class="panel-heading"><div><span class="panel-kicker">SESSION</span><h2>遊技データ</h2></div></header>
+        <dl class="stat-grid">
+          <div><dt>通常回転数</dt><dd>124<small>回</small></dd></div>
+          <div><dt>ST回転数</dt><dd>0<small>回</small></dd></div>
+          <div><dt>初当たり</dt><dd>2<small>回</small></dd></div>
+          <div><dt>LUSH突入</dt><dd>1<small>回</small></dd></div>
+          <div><dt>連チャン</dt><dd>0<small>回</small></dd></div>
+          <div><dt>最高連チャン</dt><dd>6<small>回</small></dd></div>
+          <div class="stat-wide"><dt>累計打ち出し数</dt><dd>1,620<small>玉</small></dd></div>
+        </dl>
+      </section>
+
+      <section class="data-panel history-panel">
+        <header class="panel-heading"><div><span class="panel-kicker">HISTORY</span><h2>大当たり履歴</h2></div><span class="history-count">3</span></header>
+        <ol class="history-list">
+          <li><time>10:42</time><span class="history-type">10R</span><span class="history-mode">LUSH</span></li>
+          <li><time>10:28</time><span class="history-type">3R</span><span class="history-mode">通常</span></li>
+          <li><time>10:04</time><span class="history-type">7R</span><span class="history-mode">初当たり</span></li>
+        </ol>
+        <p class="sample-note">数値・履歴は画面用の仮データです。</p>
+      </section>
     </aside>
 
-    <section class="machine-cabinet gameplay-machine" aria-label="ゲームプレイ用パチンコ盤面">
-      <div class="game-board-wrap">
-        <%= image_tag "pachinko-board.png", alt: "液晶、BONUS表示、遊技釘、玉の通路、始動口、下部表示を備えたパチンコ盤面", class: "game-board-image" %>
-        <span class="board-callout callout-lcd">液晶</span>
-        <span class="board-callout callout-bonus">BONUS表示</span>
-        <span class="board-callout callout-pins">遊技釘</span>
-        <span class="board-callout callout-route">玉の通路</span>
-        <span class="board-callout callout-start">始動口</span>
-        <span class="board-callout callout-lower">下部表示</span>
-      </div>
-      <div class="game-control-bar" aria-label="ゲームプレイ操作">
-        <div class="power-setting">
-          <label for="launch-power">発射強度</label>
-          <input id="launch-power" type="range" min="0" max="100" value="62" aria-describedby="power-readout">
-          <output id="power-readout" for="launch-power">62%</output>
+    <%= render "board" %>
+
+    <aside class="operation-sidebar" aria-label="操作パネル">
+      <section class="operation-panel state-panel">
+        <header class="panel-heading"><div><span class="panel-kicker">MACHINE STATUS</span><h2>遊技状態</h2></div></header>
+        <div class="machine-state"><i class="state-light"></i><strong>待機中</strong><span>UI SAMPLE</span></div>
+        <div class="hold-summary"><span>保留</span><div class="hold-lights" aria-label="保留サンプル 1個"><i class="hold-on"></i><i></i><i></i><i></i></div><small>1 / 4</small></div>
+      </section>
+
+      <section class="operation-panel control-panel">
+        <header class="panel-heading"><div><span class="panel-kicker">PLAYER CONTROLS</span><h2>操作パネル</h2></div><span class="sample-tag">未接続</span></header>
+
+        <div class="power-control">
+          <div class="power-heading"><label for="launch-power">発射強度</label><output id="power-readout" for="launch-power">62%</output></div>
+          <input id="launch-power" type="range" min="0" max="100" value="62" aria-describedby="controls-note">
+          <div class="power-scale"><span>弱</span><span>中</span><span>強</span></div>
         </div>
-        <div class="run-indicator" aria-live="polite"><span>遊技状態</span><strong id="run-state">停止中</strong></div>
-        <button id="launch-toggle" class="game-launch-button" type="button" aria-pressed="false">打ち出し開始</button>
-      </div>
-      <p class="gameplay-note">操作UIプレビュー — 玉の物理演算・抽選・出玉計算は未接続</p>
-    </section>
 
-    <aside class="side-rail right-rail">
-      <div class="rail-label">STATUS</div>
-      <div class="status-card"><span class="status-icon">◇</span><div><small>遊技状態</small><strong id="mode-status">停止中</strong></div></div>
-      <div class="status-card"><span class="status-icon">▦</span><div><small>保留</small><strong class="hold-lights"><i></i><i></i><i></i><i></i></strong></div></div>
-      <div class="status-card"><span class="status-icon">◉</span><div><small>回転数</small><strong>—</strong></div></div>
-      <div class="instruction-card"><span class="instruction-kicker">NEXT STEP</span><p>次の段階で盤面に玉の動きと抽選処理を追加します。</p><span class="progress-track"><i></i></span></div>
+        <fieldset class="control-group" disabled aria-describedby="controls-note">
+          <legend>打ち出し強度</legend>
+          <div class="strength-buttons">
+            <button type="button" class="strength-button weak">弱打ち</button>
+            <button type="button" class="strength-button medium">中打ち</button>
+            <button type="button" class="strength-button strong">強打ち</button>
+          </div>
+        </fieldset>
+
+        <fieldset class="control-group control-actions" disabled aria-describedby="controls-note">
+          <legend>操作</legend>
+          <div class="action-buttons">
+            <button type="button" class="action-button stop-button">■ <span>打ち出し停止</span></button>
+            <button type="button" class="action-button">Ⅱ <span>一時停止・再開</span></button>
+            <button type="button" class="action-button">↻ <span>リセット</span></button>
+            <button type="button" class="action-button investment-button">＋ <span>追加投資</span></button>
+          </div>
+        </fieldset>
+        <p id="controls-note" class="controls-note">ボタンは見本表示です。ゲームロジック未接続。</p>
+
+        <details class="physics-calibration">
+          <summary>物理検証・入賞率</summary>
+          <label for="target-hit-rate">目標入賞率 (%)</label>
+          <div class="target-rate-control">
+            <input id="target-hit-rate" type="number" min="0" max="100" step="0.1" placeholder="未設定" inputmode="decimal">
+            <button id="apply-target-rate" type="button">適用</button>
+          </div>
+          <p id="target-rate-status" role="status" aria-live="polite">目標値は未設定</p>
+          <dl class="physics-stat-grid">
+            <div><dt>完了試行</dt><dd id="physics-completed">0</dd></div>
+            <div><dt>保留</dt><dd id="physics-pending">0</dd></div>
+            <div><dt>ヘソ入賞</dt><dd id="physics-hits">0</dd></div>
+            <div><dt>実測率</dt><dd id="physics-rate">—</dd></div>
+            <div><dt>目標差</dt><dd id="physics-rate-difference">—</dd></div>
+          </dl>
+          <div class="strength-trial-stats" aria-label="発射強度別の試行結果">
+            <p>弱 <span id="physics-weak-stats">0件 / —</span></p>
+            <p>中 <span id="physics-medium-stats">0件 / —</span></p>
+            <p>強 <span id="physics-strong-stats">0件 / —</span></p>
+          </div>
+          <p class="calibration-note">完了試行は入賞または排出。流下中・取消は実測率の分母に含めません。</p>
+        </details>
+      </section>
     </aside>
-  </section>
+  </div>
 
-  <footer class="page-footer"><span>ORBIT — GAME PLAY UI</span><span>発射操作の表示のみ。玉の動き・抽選・払出は未接続です。</span></footer>
+  <footer class="simulator-footer">
+    <span>ORBIT / ORIGINAL PACHINKO SIMULATOR</span>
+    <span>盤面表示・数値・操作はサンプル。物理演算・抽選・払出は未実装です。</span>
+  </footer>
 </main>

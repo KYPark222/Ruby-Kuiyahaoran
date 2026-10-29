@@ -1,0 +1,115 @@
+<section class="board-console" aria-label="パチンコ盤面">
+  <div class="board-status-strip">
+    <span><i class="live-indicator"></i> BOARD / ORBIT-01</span>
+    <span>DISPLAY SAMPLE</span>
+  </div>
+
+  <div class="board-viewport" data-board-scene="orbit-01">
+    <%= image_tag "pachinko-board.png", class: "board-art", alt: "黒い金属フレームと透明レール、ネオン装飾を備えたオリジナルパチンコ盤面" %>
+
+    <svg class="board-component-map" viewBox="0 0 1015 1550" preserveAspectRatio="none" aria-labelledby="board-map-title board-map-description">
+      <title id="board-map-title">盤面部品マップ</title>
+      <desc id="board-map-description">釘、左側の玉通路、右打ちルート、右側入賞口、始動口、下部排出口を独立したSVG要素として配置</desc>
+      <defs>
+        <radialGradient id="pinMetal"><stop offset="0" stop-color="#fff5ba"/><stop offset=".35" stop-color="#ffd056"/><stop offset="1" stop-color="#a85d0e"/></radialGradient>
+        <linearGradient id="railTrace"><stop stop-color="#4dfcff" stop-opacity=".05"/><stop offset=".48" stop-color="#73f8ff" stop-opacity=".62"/><stop offset="1" stop-color="#4dfcff" stop-opacity=".05"/></linearGradient>
+      </defs>
+
+      <g id="outer-guides" class="component-group component-rails" data-physics-group="rails" aria-label="外周レール">
+        <path id="left-board-boundary" class="physics-rail" data-physics-role="board-boundary" d="M78 1300 C20 1160 5 1000 5 840 C5 650 25 500 80 400 C155 350 235 300 285 260"/>
+        <path id="left-outer-rail" class="physics-rail" data-physics-role="outer-rail" d="M146 404 C81 512 67 699 90 867 C106 988 175 1090 292 1187"/>
+        <path id="right-outer-rail" class="physics-rail" data-physics-role="outer-rail" d="M869 403 C936 520 951 693 927 863 C910 986 844 1090 724 1187"/>
+      </g>
+
+      <g id="left-flow-lane" class="component-group component-lanes" data-physics-group="ball-lanes" aria-label="左側の玉の通路">
+        <path class="lane-trace" data-physics-role="ball-lane" d="M110 555 C99 738 112 893 177 1028 C221 1118 298 1173 390 1235"/>
+        <path class="lane-trace lane-trace-inner" data-physics-role="ball-lane-edge" d="M143 558 C132 733 151 881 209 1002 C253 1090 318 1142 402 1194"/>
+      </g>
+
+      <g id="right-strike-lane" class="component-group component-lanes" data-physics-group="right-strike-route" aria-label="右打ちルート">
+        <path class="lane-trace" data-physics-role="right-strike-lane" d="M887 540 C909 687 900 819 844 937 L778 1041"/>
+        <path class="lane-trace lane-trace-inner" data-physics-role="right-strike-lane-edge" d="M858 558 C877 694 868 807 819 915 L756 1014"/>
+      </g>
+
+      <g id="lcd-perimeter" class="component-group component-lcd-frame" data-physics-group="lcd-protection" aria-label="液晶外周の保護レール">
+        <path id="lcd-top-guard" class="lcd-guard" data-physics-role="lcd-guard" d="M230 365 C338 350 677 350 832 365"/>
+        <path id="lcd-left-guard" class="lcd-guard" data-physics-role="lcd-guard" d="M230 365 C215 410 192 450 166 574 C168 793 172 860 184 917 C189 935 194 948 199 960"/>
+        <path id="lcd-right-guard" class="lcd-guard" data-physics-role="lcd-guard" d="M832 365 C854 515 852 790 814 960"/>
+        <path id="lcd-bottom-guard" class="lcd-guard" data-physics-role="lcd-guard" d="M199 960 C350 1004 663 1004 814 960"/>
+      </g>
+
+      <% upper_pin_rows = [
+        [230, [314, 365, 416, 467, 518, 569, 620, 671, 722]],
+        [275, [292, 344, 396, 448, 500, 552, 604, 656, 708, 760]],
+        [320, [305, 357, 409, 461, 513, 565, 617, 669, 721]]
+      ] %>
+      <g id="upper-pin-field" class="component-group component-pins" data-physics-group="upper-pins" aria-label="上部盤面釘">
+        <% upper_pin_rows.each_with_index do |(y, xs), row| %>
+          <% xs.each_with_index do |x, index| %>
+            <circle id="upper-pin-<%= row + 1 %>-<%= index + 1 %>" class="physics-pin" data-physics-role="pin" cx="<%= x %>" cy="<%= y %>" r="7" />
+          <% end %>
+        <% end %>
+      </g>
+
+      <% lower_pin_rows = [
+        [1177, [140, 194, 248, 302, 356, 410, 464, 518, 572, 626, 680, 734, 788, 842]],
+        [1218, [159, 213, 267, 321, 375, 429, 483, 537, 591, 645, 699, 753, 807, 861]],
+        [1259, [187, 241, 295, 349, 403, 457, 511, 565, 619, 673, 727, 781, 835]],
+        [1300, [222, 276, 330, 384, 438, 492, 546, 600, 654, 708, 762, 816]],
+        [1341, [273, 327, 381, 435, 489, 543, 597, 651, 705, 759]]
+      ] %>
+      <g id="lower-pin-field" class="component-group component-pins" data-physics-group="lower-pins" aria-label="下部盤面釘">
+        <% lower_pin_rows.each_with_index do |(y, xs), row| %>
+          <% xs.each_with_index do |x, index| %>
+            <circle id="lower-pin-<%= row + 1 %>-<%= index + 1 %>" class="physics-pin" data-physics-role="pin" cx="<%= x %>" cy="<%= y %>" r="7" />
+          <% end %>
+        <% end %>
+      </g>
+
+      <g id="start-pocket" class="component-group component-pocket" data-physics-group="start-pocket" aria-label="ヘソ始動口">
+        <ellipse class="pocket-outline" data-physics-role="entry-outline" cx="508" cy="1392" rx="54" ry="34"/>
+        <ellipse class="pocket-mouth" data-physics-role="entry-sensor" cx="508" cy="1392" rx="23" ry="13"/>
+      </g>
+      <g id="right-award-pocket" class="component-group component-pocket" data-physics-group="right-award-pocket" aria-label="右打ち専用入賞口">
+        <path class="award-gate" data-physics-role="award-gate" d="M853 806 h67 v76 h-67z"/>
+        <path class="award-sensor" data-physics-role="award-sensor" d="M863 822 h47 v39 h-47z"/>
+      </g>
+      <g id="lower-outlet" class="component-group component-outlet" data-physics-group="outlet" aria-label="下部玉排出口">
+        <path class="outlet-guide" data-physics-role="outlet-guide" d="M425 1450 Q508 1481 591 1450"/>
+      </g>
+    </svg>
+
+    <canvas class="physics-ball-layer" data-physics-canvas aria-hidden="true"></canvas>
+
+    <section class="lcd-interface" id="lcd-interface" data-lcd-state="normal" aria-label="液晶サンプル表示">
+      <div class="lcd-topline">
+        <span class="lcd-mode"><i></i> NORMAL</span>
+        <span class="lcd-round">演出表示 / SAMPLE</span>
+      </div>
+      <div class="symbol-reels" id="symbol-reels" aria-label="図柄サンプル 7・3・1">
+        <div class="symbol-column" data-symbol-column="left" aria-label="左列 1から9の図柄"><span class="neighbor-symbol">4</span><strong>7</strong><span class="neighbor-symbol">2</span></div>
+        <div class="symbol-column symbol-focus" data-symbol-column="center" aria-label="中列 1から9の図柄"><span class="neighbor-symbol">6</span><strong>3</strong><span class="neighbor-symbol">9</span></div>
+        <div class="symbol-column" data-symbol-column="right" aria-label="右列 1から9の図柄"><span class="neighbor-symbol">8</span><strong>1</strong><span class="neighbor-symbol">5</span></div>
+      </div>
+      <div class="lcd-message" id="lcd-message" role="status">通常状態 <span>—</span> サンプル表示</div>
+      <div class="lcd-bottomline">
+        <span>保留</span>
+        <div class="lcd-holds" id="lcd-holds" aria-label="保留表示4個"><i class="hold-on"></i><i></i><i></i><i></i></div>
+        <span class="lcd-hint">静止画面</span>
+      </div>
+    </section>
+
+    <span class="board-callout callout-pins">遊技釘</span>
+    <span class="board-callout callout-lcd">液晶</span>
+    <span class="board-callout callout-bonus">BONUS表示</span>
+    <span class="board-callout callout-route">玉の通路</span>
+    <span class="board-callout callout-start">始動口</span>
+    <span class="board-callout callout-lower">下部排出口</span>
+  </div>
+
+  <div class="board-base-strip">
+    <span>ORBIT / CUSTOM BOARD</span>
+    <span class="base-leds"><i></i><i></i><i></i><i></i></span>
+    <span>BOARD VIEW / STATIC</span>
+  </div>
+</section>

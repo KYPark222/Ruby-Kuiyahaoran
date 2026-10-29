@@ -8,7 +8,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-    <%= javascript_include_tag "game_ui", defer: true %>
+    <%= javascript_include_tag "pachinko_physics_config", "vendor/matter.min", "pachinko_entry_detector", "pachinko_trial_stats", "pachinko_physics", "game_ui", defer: true %>
 
     <%= yield :head %>
 
