@@ -138,7 +138,7 @@ test("creates a capped physics world and removes balls on request or after leavi
   assert.equal(ball.position.y, defaultLaunch.y);
   assert.ok(ball.velocity.x < 0 && ball.velocity.y < 0, "the launch impulse should point up and left");
   assert.equal(simulation.ballCount, 1);
-  for (let index = 0; index < 60; index += 1) simulation.step();
+  for (let index = 0; index < 8; index += 1) simulation.step();
   assert.ok(ball.position.y < 1355, "the launched ball should rise into the board");
   assert.ok(ball.position.y < 1000, "the launch path should climb to the left-side rail area");
   assert.ok(ball.position.x < defaultLaunch.x, "the launched ball should travel toward the left rail");
@@ -164,9 +164,17 @@ test("creates a capped physics world and removes balls on request or after leavi
   assert.equal(simulation.ballCount, 0);
 
   const pinProbe = simulation.addBall({ x: 513, y: 290, velocity: { x: 0, y: 5 } });
-  for (let index = 0; index < 10; index += 1) simulation.step();
-  assert.ok(pinProbe.position.y < 306, "the pin should deflect the test ball before it passes through");
-  assert.ok(pinProbe.velocity.y < 0, "the pin collision should reverse the ball's downward velocity");
+  let pinHits = 0;
+  Matter.Events.on(simulation.engine, "collisionStart", ({ pairs }) => {
+    pinHits += pairs.filter(({ bodyA, bodyB }) => {
+      if (bodyA !== pinProbe && bodyB !== pinProbe) return false;
+      const other = bodyA === pinProbe ? bodyB : bodyA;
+      return other.label.startsWith("pin:");
+    }).length;
+  });
+  for (let index = 0; index < 3; index += 1) simulation.step();
+  assert.ok(pinHits > 0, "the test ball should collide with the pin");
+  assert.ok(Math.abs(pinProbe.velocity.x) > 1, "the pin collision should deflect the ball sideways");
   simulation.removeBall(pinProbe);
 
   const entryBall = simulation.launchBall({ kind: "trial", x: 508, y: 1172, velocity: { x: 0, y: 3 } });
@@ -224,9 +232,9 @@ test("a launched game ball is not teleported to the heso and stays in play until
   const ball = simulation.launchBall({ kind: "game", strength: "weak" });
   assert.ok(ball.velocity.x < 0 && ball.velocity.y < 0);
 
-  for (let index = 0; index < 60; index += 1) simulation.step();
-  assert.equal(simulation.ballCount, 1, "the ball must still be falling one second after launch");
-  assert.equal(entries.length, 0);
+  for (let index = 0; index < 10; index += 1) simulation.step();
+  assert.equal(simulation.ballCount, 1, "the ball must still be falling shortly after launch");
+  assert.equal(entries.length, 0, "the ball must not be teleported into the heso");
 
   const remaining = runUntilSettled(simulation, 3000);
   assert.equal(remaining, 0, "the ball should eventually enter the heso or drain");

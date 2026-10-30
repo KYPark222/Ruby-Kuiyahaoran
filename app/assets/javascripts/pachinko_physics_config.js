@@ -1,13 +1,16 @@
 (function (root) {
   "use strict";
 
-  // 見た目合わせ用の仮初期値。実機で測定した寸法・物理定数ではありません。
+  // 見た目合わせ用の仮初期値。形状は実機の実測値ではありませんが、重力と発射速度は
+  // 玉径11mm・表示半径8px（1px≒0.6875mm）を基準に実スケールへ換算しています。
   const CONFIG = {
     viewBox: { width: 1015, height: 1550 },
-    timing: { stepMs: 1000 / 60, subSteps: 2, maxFrameMs: 100 },
-    capacity: { maxBalls: 50, maxSpeed: 18, stallSpeed: 0.2, stallSteps: 240 },
+    timing: { stepMs: 1000 / 60, subSteps: 16, maxFrameMs: 100 },
+    capacity: { maxBalls: 50, maxSpeed: 136, stallSpeed: 0.2, stallSteps: 1920 },
     engine: {
-      gravity: { x: 0, y: 1, scale: 0.00025 },
+      // 実重力 9.80665m/s² × 1.4545px/mm ≒ 14,264px/s²。
+      // Matter.jsの有効加速度は scale × 10^6 px/s² なので 0.01426。
+      gravity: { x: 0, y: 1, scale: 0.01426 },
       positionIterations: 8,
       velocityIterations: 6,
       constraintIterations: 2,
@@ -21,7 +24,8 @@
       position: { x: 145, y: 1280 },
       angleDegrees: -101.31,
       defaultStrength: "medium",
-      speeds: { weak: 13.2, medium: 15.3, strong: 17 }
+      // 実機相当（中打ち約4.76m/s）。旧値の約7.55倍。
+      speeds: { weak: 99.7, medium: 115.6, strong: 128.4 }
     },
     entry: {
       selector: "[data-physics-role='entry-sensor']",
