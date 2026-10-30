@@ -2,15 +2,16 @@
   "use strict";
 
   // 見た目合わせ用の仮初期値。形状は実機の実測値ではありませんが、重力と発射速度は
-  // 玉径11mm・表示半径8px（1px≒0.6875mm）を基準に実スケールへ換算しています。
+  // 玉径11mm・表示半径8px（1px≒0.6875mm）を基準に実スケールへ換算し、視認性のため
+  // 時間スケールを1/3（3倍スロー）にして表示しています。
   const CONFIG = {
     viewBox: { width: 1015, height: 1550 },
-    timing: { stepMs: 1000 / 60, subSteps: 16, maxFrameMs: 100 },
-    capacity: { maxBalls: 50, maxSpeed: 136, stallSpeed: 0.2, stallSteps: 1920 },
+    timing: { stepMs: 1000 / 60, subSteps: 6, maxFrameMs: 100 },
+    capacity: { maxBalls: 50, maxSpeed: 46, stallSpeed: 0.2, stallSteps: 720 },
     engine: {
-      // 実重力 9.80665m/s² × 1.4545px/mm ≒ 14,264px/s²。
-      // Matter.jsの有効加速度は scale × 10^6 px/s² なので 0.01426。
-      gravity: { x: 0, y: 1, scale: 0.01426 },
+      // 実重力換算は 9.80665m/s² × 1.4545px/mm ≒ 14,264px/s²（scale 0.01426）。
+      // Matter.jsの有効加速度は scale × 10^6 px/s²。3倍スローなので 1/9 の 0.001585。
+      gravity: { x: 0, y: 1, scale: 0.001585 },
       positionIterations: 8,
       velocityIterations: 6,
       constraintIterations: 2,
@@ -24,8 +25,8 @@
       position: { x: 145, y: 1280 },
       angleDegrees: -101.31,
       defaultStrength: "medium",
-      // 実機相当（中打ち約4.76m/s）。旧値の約7.55倍。
-      speeds: { weak: 99.7, medium: 115.6, strong: 128.4 }
+      // 実スケール（弱99.7 / 中115.6 / 強128.4）の1/3。中打ちは約1.6m/s。
+      speeds: { weak: 33.24, medium: 38.53, strong: 42.81 }
     },
     entry: {
       selector: "[data-physics-role='entry-sensor']",

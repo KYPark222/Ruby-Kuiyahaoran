@@ -45,12 +45,14 @@ test("centralizes board units and provides distinct launch strengths without set
   assert.ok(Math.hypot(medium.x, medium.y) < Math.hypot(strong.x, strong.y));
   assert.throws(() => config.velocityForStrength("turbo"), RangeError);
 
-  // 玉径11mm・表示半径8pxを基準に、重力と発射速度を実スケールへ換算している
+  // 玉径11mm・表示半径8pxを基準にした実スケールを、視認性のため1/3スローで表示している
   const pxPerMm = config.values.ball.radius / 5.5;
-  const expectedGravityScale = 9.80665 * pxPerMm * 1000 / 1e6;
+  const slowMotion = 3;
+  const realGravityScale = 9.80665 * pxPerMm * 1000 / 1e6;
+  const expectedGravityScale = realGravityScale / (slowMotion * slowMotion);
   assert.ok(Math.abs(config.values.engine.gravity.scale - expectedGravityScale) / expectedGravityScale < 0.01);
   const mediumSpeedMetersPerSecond = Math.hypot(medium.x, medium.y) * 60 / pxPerMm / 1000;
-  assert.ok(mediumSpeedMetersPerSecond > 4 && mediumSpeedMetersPerSecond < 6);
-  assert.ok(config.values.timing.subSteps >= 16);
-  assert.ok(config.values.capacity.maxSpeed >= 136);
+  assert.ok(mediumSpeedMetersPerSecond > 1 && mediumSpeedMetersPerSecond < 2);
+  assert.ok(config.values.timing.subSteps >= 6);
+  assert.ok(config.values.capacity.maxSpeed >= 46);
 });

@@ -138,7 +138,7 @@ test("creates a capped physics world and removes balls on request or after leavi
   assert.equal(ball.position.y, defaultLaunch.y);
   assert.ok(ball.velocity.x < 0 && ball.velocity.y < 0, "the launch impulse should point up and left");
   assert.equal(simulation.ballCount, 1);
-  for (let index = 0; index < 8; index += 1) simulation.step();
+  for (let index = 0; index < 18; index += 1) simulation.step();
   assert.ok(ball.position.y < 1355, "the launched ball should rise into the board");
   assert.ok(ball.position.y < 1000, "the launch path should climb to the left-side rail area");
   assert.ok(ball.position.x < defaultLaunch.x, "the launched ball should travel toward the left rail");
