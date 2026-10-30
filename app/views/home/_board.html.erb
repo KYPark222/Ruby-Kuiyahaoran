@@ -1,3 +1,4 @@
+<% board_layout = JSON.parse(File.read(Rails.root.join("app/assets/data/pachinko-board-layout.json"))) %>
 <section class="board-console" aria-label="パチンコ盤面">
   <div class="board-status-strip">
     <span><i class="live-indicator"></i> BOARD / ORBIT-01</span>
@@ -17,13 +18,20 @@
 
       <g id="outer-guides" class="component-group component-rails" data-physics-group="rails" aria-label="外周レール">
         <path id="left-board-boundary" class="physics-rail" data-physics-role="board-boundary" d="M78 1300 C20 1160 5 1000 5 840 C5 650 25 500 80 400 C155 350 235 300 285 260"/>
-        <path id="left-outer-rail" class="physics-rail" data-physics-role="outer-rail" d="M146 404 C81 512 67 699 90 867 C106 988 175 1090 292 1187"/>
+        <path id="left-outer-rail" class="physics-rail" data-physics-role="outer-rail" data-physics-disabled="true" d="M146 404 C81 512 67 699 90 867 C106 988 175 1090 292 1187"/>
         <path id="right-outer-rail" class="physics-rail" data-physics-role="outer-rail" d="M869 403 C936 520 951 693 927 863 C910 986 844 1090 724 1187"/>
       </g>
 
+      <g id="left-upper-return-physics" class="component-group component-rails" data-physics-group="left-upper-return" aria-label="左上返しの物理レール">
+        <% board_layout.fetch("returnRails").each do |rail| %>
+          <polyline id="<%= rail.fetch("id") %>" class="physics-rail physics-hidden" data-physics-role="<%= rail.fetch("role") %>" data-physics-thickness="<%= rail.fetch("thickness") %>" data-physics-friction="<%= rail.fetch("friction") %>" data-physics-static-friction="<%= rail.fetch("frictionStatic") %>" points="<%= rail.fetch("points").map { |x, y| "#{x},#{y}" }.join(" ") %>" style="opacity:0;stroke:none" />
+        <% end %>
+      </g>
+
+
       <g id="left-flow-lane" class="component-group component-lanes" data-physics-group="ball-lanes" aria-label="左側の玉の通路">
-        <path class="lane-trace" data-physics-role="ball-lane" d="M110 555 C99 738 112 893 177 1028 C221 1118 298 1173 390 1235"/>
-        <path class="lane-trace lane-trace-inner" data-physics-role="ball-lane-edge" d="M143 558 C132 733 151 881 209 1002 C253 1090 318 1142 402 1194"/>
+        <path id="left-flow-lane-outer" class="lane-trace" data-physics-role="ball-lane-outer-edge" d="M110 555 C99 738 112 893 177 1028 C221 1118 298 1173 390 1235"/>
+        <path id="left-flow-lane-inner" class="lane-trace lane-trace-inner" data-physics-role="ball-lane-inner-edge" d="M143 558 C132 733 151 881 209 1002 C253 1090 318 1142 402 1194"/>
       </g>
 
       <g id="right-strike-lane" class="component-group component-lanes" data-physics-group="right-strike-route" aria-label="右打ちルート">
@@ -32,43 +40,36 @@
       </g>
 
       <g id="lcd-perimeter" class="component-group component-lcd-frame" data-physics-group="lcd-protection" aria-label="液晶外周の保護レール">
-        <path id="lcd-top-guard" class="lcd-guard" data-physics-role="lcd-guard" d="M230 365 C338 350 677 350 832 365"/>
-        <path id="lcd-left-guard" class="lcd-guard" data-physics-role="lcd-guard" d="M230 365 C215 410 192 450 166 574 C168 793 172 860 184 917 C189 935 194 948 199 960"/>
-        <path id="lcd-right-guard" class="lcd-guard" data-physics-role="lcd-guard" d="M832 365 C854 515 852 790 814 960"/>
-        <path id="lcd-bottom-guard" class="lcd-guard" data-physics-role="lcd-guard" d="M199 960 C350 1004 663 1004 814 960"/>
+        <path id="lcd-top-guard" class="lcd-guard" data-physics-role="lcd-guard" data-physics-disabled="true" d="M230 365 C338 350 677 350 832 365"/>
+        <path id="lcd-left-guard" class="lcd-guard" data-physics-role="lcd-guard" data-physics-disabled="true" d="M230 365 C215 410 192 450 166 574 C168 793 172 860 184 917 C189 935 194 948 199 960"/>
+        <path id="lcd-right-guard" class="lcd-guard" data-physics-role="lcd-guard" data-physics-disabled="true" d="M832 365 C854 515 852 790 814 960"/>
+        <path id="lcd-bottom-guard" class="lcd-guard" data-physics-role="lcd-guard" data-physics-disabled="true" d="M199 960 C350 1004 663 1004 814 960"/>
       </g>
 
-      <% upper_pin_rows = [
-        [230, [314, 365, 416, 467, 518, 569, 620, 671, 722]],
-        [275, [292, 344, 396, 448, 500, 552, 604, 656, 708, 760]],
-        [320, [305, 357, 409, 461, 513, 565, 617, 669, 721]]
-      ] %>
       <g id="upper-pin-field" class="component-group component-pins" data-physics-group="upper-pins" aria-label="上部盤面釘">
-        <% upper_pin_rows.each_with_index do |(y, xs), row| %>
-          <% xs.each_with_index do |x, index| %>
-            <circle id="upper-pin-<%= row + 1 %>-<%= index + 1 %>" class="physics-pin" data-physics-role="pin" cx="<%= x %>" cy="<%= y %>" r="7" />
-          <% end %>
+        <% board_layout.fetch("pins").select { |pin| pin.fetch("kind") == "upper" }.each do |pin| %>
+          <circle id="<%= pin.fetch("id") %>" class="physics-pin" data-physics-role="pin" data-pin-kind="<%= pin.fetch("kind") %>" data-physical-radius="6" cx="<%= pin.fetch("x") %>" cy="<%= pin.fetch("y") %>" r="<%= pin.fetch("radius") %>" />
         <% end %>
       </g>
 
-      <% lower_pin_rows = [
-        [1177, [140, 194, 248, 302, 356, 410, 464, 518, 572, 626, 680, 734, 788, 842]],
-        [1218, [159, 213, 267, 321, 375, 429, 483, 537, 591, 645, 699, 753, 807, 861]],
-        [1259, [187, 241, 295, 349, 403, 457, 511, 565, 619, 673, 727, 781, 835]],
-        [1300, [222, 276, 330, 384, 438, 492, 546, 600, 654, 708, 762, 816]],
-        [1341, [273, 327, 381, 435, 489, 543, 597, 651, 705, 759]]
-      ] %>
+      <g id="left-upper-return-pins" class="component-group component-pins" data-physics-group="left-upper-return-pins" aria-label="左上返し釘">
+        <% board_layout.fetch("returnPins").each do |pin| %>
+          <circle id="<%= pin.fetch("id") %>" class="physics-pin" data-physics-role="return-pin" data-pin-kind="<%= pin.fetch("kind") %>" data-physical-radius="<%= pin.fetch("physicalRadius") %>" data-physical-restitution="<%= pin.fetch("restitution") %>" data-physical-friction="<%= pin.fetch("friction") %>" data-physical-static-friction="<%= pin.fetch("frictionStatic") %>" cx="<%= pin.fetch("x") %>" cy="<%= pin.fetch("y") %>" r="<%= pin.fetch("radius") %>" />
+        <% end %>
+      </g>
+
       <g id="lower-pin-field" class="component-group component-pins" data-physics-group="lower-pins" aria-label="下部盤面釘">
-        <% lower_pin_rows.each_with_index do |(y, xs), row| %>
-          <% xs.each_with_index do |x, index| %>
-            <circle id="lower-pin-<%= row + 1 %>-<%= index + 1 %>" class="physics-pin" data-physics-role="pin" cx="<%= x %>" cy="<%= y %>" r="7" />
-          <% end %>
+        <% board_layout.fetch("pins").select { |pin| pin.fetch("kind") == "lower" }.each do |pin| %>
+          <circle id="<%= pin.fetch("id") %>" class="physics-pin" data-physics-role="pin" data-pin-kind="<%= pin.fetch("kind") %>" data-physical-radius="6" cx="<%= pin.fetch("x") %>" cy="<%= pin.fetch("y") %>" r="<%= pin.fetch("radius") %>" />
         <% end %>
       </g>
 
       <g id="start-pocket" class="component-group component-pocket" data-physics-group="start-pocket" aria-label="ヘソ始動口">
-        <ellipse class="pocket-outline" data-physics-role="entry-outline" cx="508" cy="1392" rx="54" ry="34"/>
-        <ellipse class="pocket-mouth" data-physics-role="entry-sensor" cx="508" cy="1392" rx="23" ry="13"/>
+        <% board_layout.dig("entry", "funnelWalls").each do |rail| %>
+          <polyline id="<%= rail.fetch("id") %>" class="physics-rail physics-hidden" data-physics-role="<%= rail.fetch("role") %>" data-physics-thickness="<%= rail.fetch("thickness") %>" data-physics-friction="<%= rail.fetch("friction") %>" data-physics-static-friction="<%= rail.fetch("frictionStatic") %>" points="<%= rail.fetch("points").map { |x, y| "#{x},#{y}" }.join(" ") %>" style="opacity:0;stroke:none" />
+        <% end %>
+        <ellipse class="pocket-outline" data-physics-role="entry-outline" cx="<%= board_layout.dig("entry", "cx") %>" cy="<%= board_layout.dig("entry", "cy") %>" rx="54" ry="34"/>
+        <ellipse class="pocket-mouth" data-physics-role="entry-sensor" cx="<%= board_layout.dig("entry", "cx") %>" cy="<%= board_layout.dig("entry", "cy") %>" rx="<%= board_layout.dig("entry", "rx") %>" ry="<%= board_layout.dig("entry", "ry") %>"/>
       </g>
       <g id="right-award-pocket" class="component-group component-pocket" data-physics-group="right-award-pocket" aria-label="右打ち専用入賞口">
         <path class="award-gate" data-physics-role="award-gate" d="M853 806 h67 v76 h-67z"/>
@@ -94,7 +95,7 @@
       <div class="lcd-message" id="lcd-message" role="status">通常状態 <span>—</span> サンプル表示</div>
       <div class="lcd-bottomline">
         <span>保留</span>
-        <div class="lcd-holds" id="lcd-holds" aria-label="保留表示4個"><i class="hold-on"></i><i></i><i></i><i></i></div>
+        <div class="lcd-holds" id="lcd-holds" aria-label="保留<%= @hold_count %>個"><% 4.times do |index| %><i class="<%= "hold-on" if index < @hold_count %>"></i><% end %></div>
         <span class="lcd-hint">静止画面</span>
       </div>
     </section>

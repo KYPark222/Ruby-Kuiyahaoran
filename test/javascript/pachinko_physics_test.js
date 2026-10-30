@@ -3,6 +3,7 @@ const assert = require("node:assert/strict");
 require("../../app/assets/javascripts/pachinko_physics_config.js");
 require("../../app/assets/javascripts/pachinko_entry_detector.js");
 require("../../app/assets/javascripts/pachinko_trial_stats.js");
+const boardLayout = require("../../app/assets/data/pachinko-board-layout.json");
 const Matter = require("../../app/assets/javascripts/vendor/matter.min.js");
 const { createSimulation, maxBalls, defaultLaunch } = require("../../app/assets/javascripts/pachinko_physics.js");
 
@@ -19,54 +20,109 @@ function createCanvas() {
   return { dataset: {}, getContext: () => context };
 }
 
-function createSvg() {
-  const pin = {
-    id: "test-pin",
-    getAttribute(name) { return ({ r: "7", cx: "314", cy: "280" })[name]; }
-  };
-  const paths = [
-    [[78, 1300], [20, 1160], [5, 1000], [5, 840], [5, 650], [25, 500], [80, 400], [155, 350], [235, 300], [285, 260]],
-    [[146, 404], [81, 512], [67, 699], [90, 867], [106, 988], [175, 1090], [292, 1187]],
-    [[143, 558], [132, 733], [151, 881], [209, 1002], [253, 1090], [318, 1142], [402, 1194]],
-    [[230, 365], [338, 350], [677, 350], [832, 365]],
-    [[230, 365], [215, 410], [192, 450], [166, 574], [168, 793], [184, 917], [199, 960]],
-    [[832, 365], [854, 515], [852, 790], [814, 960]],
-    [[199, 960], [814, 960]]
-  ].map((points, index) => {
-    const lengths = points.slice(1).map((point, i) => Math.hypot(point[0] - points[i][0], point[1] - points[i][1]));
-    const totalLength = lengths.reduce((sum, length) => sum + length, 0);
-    return {
-      id: `test-path-${index}`,
-      dataset: { physicsRole: index > 2 ? "lcd-guard" : (index === 2 ? "ball-lane-edge" : "outer-rail") },
-      classList: { contains: (name) => name === (index > 2 ? "lcd-guard" : (index === 2 ? "lane-trace-inner" : "physics-rail")) },
-      getTotalLength: () => totalLength,
-      getPointAtLength(distance) {
-        let remaining = Math.min(distance, totalLength);
-        for (let i = 0; i < lengths.length; i += 1) {
-          if (remaining <= lengths[i]) {
-            const ratio = lengths[i] === 0 ? 0 : remaining / lengths[i];
-            return { x: points[i][0] + (points[i + 1][0] - points[i][0]) * ratio, y: points[i][1] + (points[i + 1][1] - points[i][1]) * ratio };
-          }
-          remaining -= lengths[i];
+function makeCurveElement({ id, role, points, thickness, friction, frictionStatic, classes = ["physics-rail"], disabled = false }) {
+  const lengths = points.slice(1).map((point, index) => Math.hypot(point[0] - points[index][0], point[1] - points[index][1]));
+  const totalLength = lengths.reduce((sum, length) => sum + length, 0);
+  return {
+    id,
+    dataset: { physicsRole: role },
+    classList: { contains: (name) => classes.includes(name) },
+    getAttribute(name) {
+      if (name === "data-physics-disabled") return disabled ? "true" : null;
+      if (name === "data-physics-thickness") return thickness == null ? null : String(thickness);
+      if (name === "data-physics-friction") return friction == null ? null : String(friction);
+      if (name === "data-physics-static-friction") return frictionStatic == null ? null : String(frictionStatic);
+      return null;
+    },
+    getTotalLength: () => totalLength,
+    getPointAtLength(distance) {
+      let remaining = Math.min(distance, totalLength);
+      for (let index = 0; index < lengths.length; index += 1) {
+        if (remaining <= lengths[index]) {
+          const ratio = lengths[index] === 0 ? 0 : remaining / lengths[index];
+          return { x: points[index][0] + (points[index + 1][0] - points[index][0]) * ratio, y: points[index][1] + (points[index + 1][1] - points[index][1]) * ratio };
         }
-        return { x: points.at(-1)[0], y: points.at(-1)[1] };
+        remaining -= lengths[index];
       }
-    };
+      return { x: points.at(-1)[0], y: points.at(-1)[1] };
+    }
+  };
+}
+
+function createSvg() {
+  const pins = [...boardLayout.pins, ...boardLayout.returnPins].map((pin) => ({
+    id: pin.id,
+    getAttribute(name) { return ({
+      r: String(pin.radius), cx: String(pin.x), cy: String(pin.y),
+      "data-physical-radius": String(pin.physicalRadius || 6),
+      "data-physical-restitution": pin.restitution == null ? null : String(pin.restitution),
+      "data-physical-friction": pin.friction == null ? null : String(pin.friction),
+      "data-physical-static-friction": pin.frictionStatic == null ? null : String(pin.frictionStatic)
+    })[name]; }
+  }));
+  const paths = [
+    makeCurveElement({
+      id: "left-board-boundary", role: "board-boundary",
+      points: [[78, 1300], [20, 1160], [5, 1000], [5, 840], [5, 650], [25, 500], [80, 400], [155, 350], [235, 300], [285, 260]]
+    }),
+    makeCurveElement({
+      id: "left-outer-rail", role: "outer-rail", disabled: true,
+      points: [[146, 404], [81, 512], [67, 699], [90, 867], [106, 988], [175, 1090], [292, 1187]]
+    }),
+    makeCurveElement({
+      id: "left-flow-lane-inner", role: "ball-lane-inner-edge", classes: [], disabled: true,
+      points: [[143, 558], [132, 733], [151, 881], [209, 1002], [253, 1090], [318, 1142], [402, 1194]]
+    }),
+    makeCurveElement({
+      id: "lcd-top-guard", role: "lcd-guard", classes: ["lcd-guard"], disabled: true,
+      points: [[230, 365], [338, 350], [677, 350], [832, 365]]
+    }),
+    makeCurveElement({
+      id: "lcd-left-guard", role: "lcd-guard", classes: ["lcd-guard"], disabled: true,
+      points: [[230, 365], [215, 410], [192, 450], [166, 574], [168, 793], [184, 917], [199, 960]]
+    }),
+    makeCurveElement({
+      id: "lcd-right-guard", role: "lcd-guard", classes: ["lcd-guard"], disabled: true,
+      points: [[832, 365], [854, 515], [852, 790], [814, 960]]
+    }),
+    makeCurveElement({
+      id: "lcd-bottom-guard", role: "lcd-guard", classes: ["lcd-guard"], disabled: true,
+      points: [[199, 960], [350, 1004], [663, 1004], [814, 960]]
+    })
+  ];
+
+  boardLayout.returnRails.forEach((rail) => {
+    paths.push(makeCurveElement({
+      id: rail.id, role: rail.role, points: rail.points,
+      thickness: rail.thickness, friction: rail.friction, frictionStatic: rail.frictionStatic
+    }));
+  });
+
+  boardLayout.entry.funnelWalls.forEach((rail) => {
+    paths.push(makeCurveElement({
+      id: rail.id, role: rail.role, points: rail.points,
+      thickness: rail.thickness, friction: rail.friction, frictionStatic: rail.frictionStatic
+    }));
   });
 
   return {
     querySelector(selector) {
       if (selector.includes("entry-sensor")) {
-        return { getAttribute(name) { return ({ cx: "508", cy: "1392", rx: "23", ry: "13" })[name]; } };
+        return { getAttribute(name) { return ({ cx: "508", cy: "1194", rx: "23", ry: "13" })[name]; } };
       }
       return null;
     },
     querySelectorAll(selector) {
-      if (selector === ".physics-pin") return [pin];
-      if (selector.includes("lcd-guard")) return paths.filter((_, index) => index !== 2);
+      if (selector === ".physics-pin") return pins;
+      if (selector.includes("physics-lane") || selector.includes("physics-rail")) return paths;
       return [];
     }
   };
+}
+
+function runUntilSettled(simulation, limit = 3000) {
+  for (let index = 0; index < limit && simulation.ballCount > 0; index += 1) simulation.step();
+  return simulation.ballCount;
 }
 
 test("creates a capped physics world and removes balls on request or after leaving the board", () => {
@@ -88,30 +144,32 @@ test("creates a capped physics world and removes balls on request or after leavi
   assert.ok(ball.position.x < defaultLaunch.x, "the launched ball should travel toward the left rail");
   assert.ok(ball.position.x > 0, "the launched ball should remain inside the board");
   assert.ok(railContacts > 0, "the launched ball should collide with the outer rail");
-  for (let index = 0; index < 180 && ball.position.y > 404 && simulation.ballCount > 0; index += 1) simulation.step();
-  assert.ok(ball.position.y <= 404, "the launch should reach the upper board area");
-  assert.equal(simulation.engine.world.bodies.filter((body) => body.label === "lcd-guard").length > 0, true);
+
+  assert.equal(simulation.engine.world.bodies.filter((body) => body.label === "lcd-guard").length, 0);
+  assert.equal(simulation.engine.world.bodies.filter((body) => body.label === "outer-rail").length, 0);
+  assert.deepEqual(
+    simulation.engine.world.bodies.filter((body) => body.label.startsWith("entry-guide:")).map((body) => body.label).sort(),
+    ["entry-guide:left", "entry-guide:right"]
+  );
+  assert.ok(simulation.engine.world.bodies.some((body) => body.label === "upper-feed-rail"));
+  assert.ok(simulation.engine.world.bodies.some((body) => body.label === "upper-feed-return-edge"));
+  assert.ok(simulation.engine.world.bodies.some((body) => body.label === "heso-funnel-left"));
+  assert.ok(simulation.engine.world.bodies.some((body) => body.label === "heso-funnel-right"));
+  assert.equal(simulation.engine.world.bodies.filter((body) => body.label.startsWith("pin:N10")).length, 4);
+  assert.equal(simulation.engine.world.bodies.filter((body) => body.label === "pin:lower-1-7").length, 0);
+  assert.equal(simulation.engine.world.bodies.filter((body) => body.label === "pin:lower-1-8").length, 0);
 
   assert.equal(simulation.removeBall(ball), true);
   assert.equal(simulation.removeBall(ball), false);
   assert.equal(simulation.ballCount, 0);
 
-  const pinProbe = simulation.addBall({ x: 314, y: 250, velocity: { x: 0, y: 5 } });
+  const pinProbe = simulation.addBall({ x: 513, y: 290, velocity: { x: 0, y: 5 } });
   for (let index = 0; index < 10; index += 1) simulation.step();
-  assert.ok(pinProbe.position.y < 266, "the pin should deflect the test ball before it passes through");
+  assert.ok(pinProbe.position.y < 306, "the pin should deflect the test ball before it passes through");
+  assert.ok(pinProbe.velocity.y < 0, "the pin collision should reverse the ball's downward velocity");
   simulation.removeBall(pinProbe);
 
-  let lcdGuardContacts = 0;
-  Matter.Events.on(simulation.engine, "collisionStart", ({ pairs }) => {
-    if (pairs.some(({ bodyA, bodyB }) => bodyA.label === "lcd-guard" || bodyB.label === "lcd-guard")) lcdGuardContacts += 1;
-  });
-  const lcdProbe = simulation.addBall({ x: 500, y: 320, velocity: { x: 0, y: 14 } });
-  for (let index = 0; index < 12; index += 1) simulation.step();
-  assert.ok(lcdGuardContacts > 0, "the ball should collide with the physical LCD perimeter");
-  assert.ok(lcdProbe.position.y < 350, "the ball should not enter the LCD protected region");
-  simulation.removeBall(lcdProbe);
-
-  const entryBall = simulation.launchBall({ kind: "trial", x: 508, y: 1370, velocity: { x: 0, y: 3 } });
+  const entryBall = simulation.launchBall({ kind: "trial", x: 508, y: 1172, velocity: { x: 0, y: 3 } });
   for (let index = 0; index < 12 && simulation.ballCount > 0; index += 1) simulation.step();
   assert.equal(simulation.ballCount, 0, "a ball passing through the opening should be removed once");
   assert.equal(simulation.stats.snapshot().overall.hits, 1);
@@ -127,4 +185,53 @@ test("creates a capped physics world and removes balls on request or after leavi
   assert.equal(simulation.addBall({ x: 100, y: 100 }), null);
   simulation.destroy();
   assert.equal(simulation.isDestroyed, true);
+});
+
+test("a return-pin strike redirects a leftward ball into the left passage", () => {
+  const simulation = createSimulation({ Matter, svg: createSvg(), canvas: createCanvas(), options: { enableSleeping: false } });
+  const ball = simulation.addBall({ x: 200, y: 315, velocity: { x: -8, y: 0 } });
+  let returnPinContacts = 0;
+  Matter.Events.on(simulation.engine, "collisionStart", ({ pairs }) => {
+    returnPinContacts += pairs.filter(({ bodyA, bodyB }) => bodyA.label.startsWith("pin:N10") || bodyB.label.startsWith("pin:N10")).length;
+  });
+
+  for (let index = 0; index < 20 && simulation.ballCount > 0 && returnPinContacts === 0; index += 1) simulation.step();
+
+  assert.ok(returnPinContacts > 0, `the incoming ball should contact a return pin (x=${ball.position.x.toFixed(1)}, y=${ball.position.y.toFixed(1)})`);
+  simulation.removeBall(ball);
+  simulation.destroy();
+});
+
+test("a ball dropped toward the heso follows the funnel and is accepted without teleporting", () => {
+  const entries = [];
+  const simulation = createSimulation({ Matter, svg: createSvg(), canvas: createCanvas(), options: { onEntry: (entry) => entries.push(entry) } });
+  const ball = simulation.launchBall({ kind: "trial", x: 508, y: 1080, velocity: { x: 0, y: 4 } });
+  assert.ok(ball);
+
+  for (let index = 0; index < 90 && simulation.ballCount > 0; index += 1) simulation.step();
+
+  assert.equal(simulation.ballCount, 0, "the ball should fall into the heso and leave the board");
+  assert.equal(entries.length, 1);
+  assert.equal(entries[0].ballId, String(ball.id));
+  assert.equal(entries[0].fallback, undefined);
+  assert.equal(simulation.stats.snapshot().overall.hits, 1);
+  simulation.destroy();
+});
+
+test("a launched game ball is not teleported to the heso and stays in play until it resolves", () => {
+  const entries = [];
+  const simulation = createSimulation({ Matter, svg: createSvg(), canvas: createCanvas(), options: { onEntry: (entry) => entries.push(entry) } });
+  const ball = simulation.launchBall({ kind: "game", strength: "weak" });
+  assert.ok(ball.velocity.x < 0 && ball.velocity.y < 0);
+
+  for (let index = 0; index < 60; index += 1) simulation.step();
+  assert.equal(simulation.ballCount, 1, "the ball must still be falling one second after launch");
+  assert.equal(entries.length, 0);
+
+  const remaining = runUntilSettled(simulation, 3000);
+  assert.equal(remaining, 0, "the ball should eventually enter the heso or drain");
+  const overall = simulation.stats.snapshot().overall;
+  assert.equal(overall.completed, 1);
+  assert.equal(overall.hits + overall.escaped, 1);
+  simulation.destroy();
 });

@@ -52,12 +52,12 @@
     <aside class="operation-sidebar" aria-label="操作パネル">
       <section class="operation-panel state-panel">
         <header class="panel-heading"><div><span class="panel-kicker">MACHINE STATUS</span><h2>遊技状態</h2></div></header>
-        <div class="machine-state"><i class="state-light"></i><strong>待機中</strong><span>UI SAMPLE</span></div>
-        <div class="hold-summary"><span>保留</span><div class="hold-lights" aria-label="保留サンプル 1個"><i class="hold-on"></i><i></i><i></i><i></i></div><small>1 / 4</small></div>
+        <div class="machine-state"><i class="state-light"></i><strong>待機中</strong><span>通常状態</span></div>
+        <div class="hold-summary"><span>保留</span><div class="hold-lights" aria-label="保留<%= @hold_count %>個"><% 4.times do |index| %><i class="<%= "hold-on" if index < @hold_count %>"></i><% end %></div><small><%= @hold_count %> / 4</small></div>
       </section>
 
       <section class="operation-panel control-panel">
-        <header class="panel-heading"><div><span class="panel-kicker">PLAYER CONTROLS</span><h2>操作パネル</h2></div><span class="sample-tag">未接続</span></header>
+        <header class="panel-heading"><div><span class="panel-kicker">PLAYER CONTROLS</span><h2>操作パネル</h2></div><span class="sample-tag">接続中</span></header>
 
         <div class="power-control">
           <div class="power-heading"><label for="launch-power">発射強度</label><output id="power-readout" for="launch-power">62%</output></div>
@@ -65,25 +65,25 @@
           <div class="power-scale"><span>弱</span><span>中</span><span>強</span></div>
         </div>
 
-        <fieldset class="control-group" disabled aria-describedby="controls-note">
+        <fieldset class="control-group" aria-describedby="controls-note">
           <legend>打ち出し強度</legend>
           <div class="strength-buttons">
-            <button type="button" class="strength-button weak">弱打ち</button>
-            <button type="button" class="strength-button medium">中打ち</button>
-            <button type="button" class="strength-button strong">強打ち</button>
+            <button type="button" class="strength-button weak" data-launch-strength="weak">弱打ち</button>
+            <button type="button" class="strength-button medium" data-launch-strength="medium">中打ち</button>
+            <button type="button" class="strength-button strong" data-launch-strength="strong">強打ち</button>
           </div>
         </fieldset>
 
-        <fieldset class="control-group control-actions" disabled aria-describedby="controls-note">
+        <fieldset class="control-group control-actions" aria-describedby="controls-note">
           <legend>操作</legend>
           <div class="action-buttons">
-            <button type="button" class="action-button stop-button">■ <span>打ち出し停止</span></button>
-            <button type="button" class="action-button">Ⅱ <span>一時停止・再開</span></button>
-            <button type="button" class="action-button">↻ <span>リセット</span></button>
+            <button type="button" class="action-button stop-button" data-simulation-action="stop">■ <span>打ち出し停止</span></button>
+            <button type="button" class="action-button" data-simulation-action="pause">Ⅱ <span>一時停止・再開</span></button>
+            <button type="button" class="action-button" data-simulation-action="reset">↻ <span>リセット</span></button>
             <button type="button" class="action-button investment-button">＋ <span>追加投資</span></button>
           </div>
         </fieldset>
-        <p id="controls-note" class="controls-note">ボタンは見本表示です。ゲームロジック未接続。</p>
+        <p id="controls-note" class="controls-note">発射した玉がヘソに到達すると抽選します。保留上限4個。</p>
 
         <details class="physics-calibration">
           <summary>物理検証・入賞率</summary>
@@ -113,6 +113,6 @@
 
   <footer class="simulator-footer">
     <span>ORBIT / ORIGINAL PACHINKO SIMULATOR</span>
-    <span>盤面表示・数値・操作はサンプル。物理演算・抽選・払出は未実装です。</span>
+    <span>発射・ヘソ入賞・抽選はセッション内で動作します。</span>
   </footer>
 </main>

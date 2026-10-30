@@ -7,9 +7,22 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "svg.board-component-map"
     assert_select "canvas[data-physics-canvas]"
-    assert_select ".physics-rail", count: 3
+    assert_select ".physics-rail", count: 7
+    assert_select ".physics-rail#R002", count: 1
+    assert_select ".physics-rail#R003", count: 1
+    assert_select ".physics-rail#heso-funnel-left", count: 1
+    assert_select ".physics-rail#heso-funnel-right", count: 1
+    assert_select "[data-physics-disabled='true']", count: 5
+    assert_select "#left-outer-rail[data-physics-disabled='true']", count: 1
+    assert_select ".lcd-guard[data-physics-disabled='true']", count: 4
     assert_select ".lcd-guard", count: 4
     assert_select ".physics-pin", minimum: 90
+    assert_select ".physics-pin#lower-1-7", count: 0
+    assert_select ".physics-pin#lower-1-8", count: 0
+    assert_select ".physics-pin#N101", count: 1
+    assert_select ".physics-pin#N102", count: 1
+    assert_select ".physics-pin#N103", count: 1
+    assert_select ".physics-pin#N104", count: 1
     assert_select ".physics-pin[cy='363']", count: 0
     assert_select ".physics-pin[cy='404']", count: 0
     assert_select ".physics-pin[cy='320']", count: 9
@@ -24,7 +37,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select ".history-list li", count: 3
     assert_select ".strength-button", count: 3
     assert_select ".action-button", count: 4
-    assert_select "fieldset[disabled]", count: 2
+    assert_select "fieldset[disabled]", count: 0
     assert_select "input[type='range'][id='launch-power']"
     assert_select "input[type='number'][id='target-hit-rate']", count: 1
     assert_select "button[id='apply-target-rate']", count: 1

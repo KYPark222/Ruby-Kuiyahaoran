@@ -10,4 +10,6 @@ Rails.application.routes.draw do
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   root "home#index"
+  post "pachinko/entry", to: "pachinko_entries#create", as: :pachinko_entry
+  post "pachinko/reset", to: "pachinko_entries#reset", as: :pachinko_reset
 end

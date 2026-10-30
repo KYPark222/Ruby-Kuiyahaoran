@@ -5,7 +5,7 @@
   const CONFIG = {
     viewBox: { width: 1015, height: 1550 },
     timing: { stepMs: 1000 / 60, subSteps: 2, maxFrameMs: 100 },
-    capacity: { maxBalls: 50, maxSpeed: 18 },
+    capacity: { maxBalls: 50, maxSpeed: 18, stallSpeed: 0.2, stallSteps: 240 },
     engine: {
       gravity: { x: 0, y: 1, scale: 0.00025 },
       positionIterations: 8,
@@ -15,7 +15,7 @@
     },
     ball: { radius: 8, restitution: 0.35, friction: 0.025, frictionStatic: 0.01, frictionAir: 0.001, density: 0.001 },
     pin: { radius: 6, visualClearance: 1, restitution: 0.35, friction: 0.04 },
-    rail: { thickness: 8, laneThickness: 5, restitution: 0.08, friction: 0.02, sampleGap: 10, segmentSizeFactor: 1.5 },
+    rail: { thickness: 8, laneThickness: 5, restitution: 0.08, friction: 0.02, frictionStatic: 0.01, sampleGap: 10, segmentSizeFactor: 1.5 },
     lcdGuard: { thickness: 7, restitution: 0.15, friction: 0.005 },
     launcher: {
       position: { x: 145, y: 1280 },
@@ -23,7 +23,11 @@
       defaultStrength: "medium",
       speeds: { weak: 13.2, medium: 15.3, strong: 17 }
     },
-    entry: { selector: "[data-physics-role='entry-sensor']", ballClearance: 0 },
+    entry: {
+      selector: "[data-physics-role='entry-sensor']",
+      ballClearance: 0,
+      guideWalls: { offsetX: 26, startY: -15, endY: 18, thickness: 6 }
+    },
     exit: { margin: 8 },
     targetHitRatePercent: null
   };
