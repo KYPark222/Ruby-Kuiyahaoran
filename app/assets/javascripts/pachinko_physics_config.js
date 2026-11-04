@@ -23,10 +23,12 @@
     lcdGuard: { thickness: 7, restitution: 0.15, friction: 0.005 },
     launcher: {
       defaultMode: "left",
-      // 左右で同じ初速。実スケール中打ち115.6の1/3（約1.6m/s）に合わせています。
+      // 打ち出し位置・角度は左右とも共通で、右打ちは初速だけを上げて
+      // 玉が上部ステージを横切って右側へ落ちるようにしています。
+      // 左打ち30（約1.2m/s）・右打ち36（約1.5m/s）は3倍スロー時の調整値です。
       modes: {
-        left: { position: { x: 145, y: 1280 }, angleDegrees: -101.31, speed: 38.53 },
-        right: { position: { x: 870, y: 1280 }, angleDegrees: -78.69, speed: 38.53 }
+        left: { position: { x: 145, y: 1280 }, angleDegrees: -101.31, speed: 30 },
+        right: { position: { x: 145, y: 1280 }, angleDegrees: -101.31, speed: 36 }
       }
     },
     entry: {
@@ -34,7 +36,7 @@
       ballClearance: 0,
       guideWalls: { offsetX: 26, startY: -15, endY: 18, thickness: 6 }
     },
-    autoLaunch: { intervalMs: 1000, maxConcurrent: 10, angleJitterDegrees: 1.2 },
+    autoLaunch: { intervalMs: 1000, maxConcurrent: 10, angleJitterDegrees: 0.2 },
     exit: { margin: 8 },
     targetHitRatePercent: null
   };

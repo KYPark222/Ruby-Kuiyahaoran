@@ -21,7 +21,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select ".physics-rail#right-board-boundary[data-physics-role='board-boundary']", count: 1
     assert_select ".lcd-guard[data-physics-disabled='true']", count: 4
     assert_select ".lcd-guard", count: 4
-    assert_select ".physics-pin", minimum: 90
+    assert_select ".physics-pin", count: 84
     assert_select ".physics-pin#lower-1-7", count: 0
     assert_select ".physics-pin#lower-1-8", count: 0
     assert_select ".physics-pin#N101", count: 1
@@ -30,7 +30,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select ".physics-pin#N104", count: 1
     assert_select ".physics-pin[cy='363']", count: 0
     assert_select ".physics-pin[cy='404']", count: 0
-    assert_select ".physics-pin[cy='320']", count: 9
+    assert_select ".physics-pin[cy='320']", count: 0
     assert_select "[data-physics-role='award-gate']", count: 1
     assert_select "section#lcd-interface[data-lcd-state='normal']"
     assert_select "#symbol-reels [data-symbol-column]", count: 3

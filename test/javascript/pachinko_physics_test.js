@@ -153,7 +153,7 @@ test("creates a capped physics world and removes balls on request or after leavi
   assert.equal(ball.position.y, defaultLaunch.y);
   assert.ok(ball.velocity.x < 0 && ball.velocity.y < 0, "the launch impulse should point up and left");
   assert.equal(simulation.ballCount, 1);
-  for (let index = 0; index < 18; index += 1) simulation.step();
+  for (let index = 0; index < 30; index += 1) simulation.step();
   assert.ok(ball.position.y < 1355, "the launched ball should rise into the board");
   assert.ok(ball.position.y < 1000, "the launch path should climb to the left-side rail area");
   assert.ok(ball.position.x < defaultLaunch.x, "the launched ball should travel toward the left rail");
@@ -181,7 +181,7 @@ test("creates a capped physics world and removes balls on request or after leavi
   assert.equal(simulation.removeBall(ball), false);
   assert.equal(simulation.ballCount, 0);
 
-  const pinProbe = simulation.addBall({ x: 513, y: 290, velocity: { x: 0, y: 5 } });
+  const pinProbe = simulation.addBall({ x: 506, y: 238, velocity: { x: 0, y: 5 } });
   let pinHits = 0;
   Matter.Events.on(simulation.engine, "collisionStart", ({ pairs }) => {
     pinHits += pairs.filter(({ bodyA, bodyB }) => {
@@ -190,7 +190,7 @@ test("creates a capped physics world and removes balls on request or after leavi
       return other.label.startsWith("pin:");
     }).length;
   });
-  for (let index = 0; index < 3; index += 1) simulation.step();
+  for (let index = 0; index < 10; index += 1) simulation.step();
   assert.ok(pinHits > 0, "the test ball should collide with the pin");
   assert.ok(Math.abs(pinProbe.velocity.x) > 1, "the pin collision should deflect the ball sideways");
   simulation.removeBall(pinProbe);
@@ -262,17 +262,41 @@ test("a launched game ball is not teleported to the heso and stays in play until
   simulation.destroy();
 });
 
-test("the right launch mode climbs the right rail and falls on the right side", () => {
+function sideWhenDescending(mode, angleOffsetDegrees = 0) {
+  const simulation = createSimulation({ Matter, svg: createSvg(), canvas: createCanvas() });
+  const base = config.velocityForMode(mode);
+  const radians = (angleOffsetDegrees * Math.PI) / 180;
+  const velocity = {
+    x: base.x * Math.cos(radians) - base.y * Math.sin(radians),
+    y: base.x * Math.sin(radians) + base.y * Math.cos(radians)
+  };
+  const ball = simulation.launchBall({ kind: "game", mode, velocity });
+  let side = null;
+  for (let index = 0; index < 3000 && simulation.ballCount > 0; index += 1) {
+    simulation.step();
+    const body = simulation.engine.world.bodies.find(({ id }) => id === ball.id);
+    if (!body) break;
+    if (side === null && body.position.y > 700 && body.velocity.y > 0.5) {
+      side = body.position.x > config.values.viewBox.width / 2 ? "right" : "left";
+    }
+  }
+  simulation.destroy();
+  return side;
+}
+
+test("both launch modes start from the bottom-left and the right mode is the stronger impulse", () => {
   const simulation = createSimulation({ Matter, svg: createSvg(), canvas: createCanvas() });
   const mode = config.values.launcher.modes.right;
   const ball = simulation.launchBall({ kind: "game", mode: "right" });
 
+  assert.deepEqual({ x: ball.position.x, y: ball.position.y }, { x: 145, y: 1280 });
   assert.equal(ball.position.x, mode.position.x);
   assert.equal(ball.position.y, mode.position.y);
-  assert.ok(ball.velocity.x > 0 && ball.velocity.y < 0, "the right launch impulse should point up and right");
-
-  for (let index = 0; index < 120 && simulation.ballCount > 0; index += 1) simulation.step();
-  assert.ok(ball.position.x > config.values.viewBox.width / 2, "the right launch must stay on the right half of the board");
+  assert.ok(ball.velocity.y < 0, "the right launch impulse should still point upward");
+  assert.ok(Math.hypot(ball.velocity.x, ball.velocity.y) > Math.hypot(
+    config.velocityForMode("left").x,
+    config.velocityForMode("left").y
+  ));
 
   const remaining = runUntilSettled(simulation, 3000);
   assert.equal(remaining, 0, "the right-launched ball should eventually enter the heso or drain");
@@ -280,6 +304,17 @@ test("the right launch mode climbs the right rail and falls on the right side", 
   assert.equal(byMode.right.completed, 1);
   assert.equal(byMode.left, undefined);
   simulation.destroy();
+});
+
+test("right-mode launches mostly fall on the right side while left-mode launches stay on the left", () => {
+  const jitter = config.values.autoLaunch.angleJitterDegrees;
+  const offsets = [-jitter, -jitter / 2, 0, jitter / 2, jitter];
+
+  const rightSides = offsets.map((offset) => sideWhenDescending("right", offset));
+  assert.ok(rightSides.filter((side) => side === "right").length >= 4, `right mode should fall right: ${rightSides.join(",")}`);
+
+  const leftSides = offsets.map((offset) => sideWhenDescending("left", offset));
+  assert.equal(leftSides.filter((side) => side === "right").length, 0, `left mode should stay left: ${leftSides.join(",")}`);
 });
 
 function pointInPolygon(x, y, points) {

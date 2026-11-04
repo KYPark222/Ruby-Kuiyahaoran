@@ -5,7 +5,8 @@ const boardLayout = require("../../app/assets/data/pachinko-board-layout.json");
 
 test("keeps individually identified pins and the entry aperture in the board coordinate system", () => {
   assert.deepEqual(boardLayout.viewBox, config.values.viewBox);
-  assert.equal(boardLayout.pins.length, 89);
+  assert.equal(boardLayout.pins.length, 80);
+  assert.equal(boardLayout.pins.filter(({ id }) => id.startsWith("upper-3")).length, 0);
   assert.equal(new Set(boardLayout.pins.map(({ id }) => id)).size, boardLayout.pins.length);
   assert.ok(boardLayout.pins.every(({ x, y, radius }) => x > 0 && y > 0 && radius > 0));
   assert.deepEqual(
@@ -50,14 +51,16 @@ test("centralizes board units and provides left and right launch modes without s
   const leftMode = config.launchMode("left");
   const rightMode = config.launchMode("right");
   assert.deepEqual(leftMode.position, { x: 145, y: 1280 });
-  assert.deepEqual(rightMode.position, { x: 870, y: 1280 });
-  assert.equal(leftMode.position.x + rightMode.position.x, config.values.viewBox.width);
+  assert.deepEqual(rightMode.position, leftMode.position);
+  assert.equal(rightMode.angleDegrees, leftMode.angleDegrees);
+  assert.ok(rightMode.speed > leftMode.speed);
+  assert.ok(config.values.capacity.maxSpeed >= rightMode.speed);
 
   const left = config.velocityForMode("left");
   const right = config.velocityForMode("right");
   assert.ok(left.y < 0 && left.x < 0);
-  assert.ok(right.y < 0 && right.x > 0);
-  assert.equal(Math.hypot(left.x, left.y), Math.hypot(right.x, right.y));
+  assert.ok(right.y < 0 && right.x < 0);
+  assert.ok(Math.hypot(right.x, right.y) > Math.hypot(left.x, left.y));
   assert.throws(() => config.velocityForMode("turbo"), RangeError);
 
   // 玉径11mm・表示半径8pxを基準にした実スケールを、視認性のため1/3スローで表示している
@@ -66,11 +69,11 @@ test("centralizes board units and provides left and right launch modes without s
   const realGravityScale = 9.80665 * pxPerMm * 1000 / 1e6;
   const expectedGravityScale = realGravityScale / (slowMotion * slowMotion);
   assert.ok(Math.abs(config.values.engine.gravity.scale - expectedGravityScale) / expectedGravityScale < 0.01);
-  const launchSpeedMetersPerSecond = Math.hypot(left.x, left.y) * 60 / pxPerMm / 1000;
+  const launchSpeedMetersPerSecond = Math.hypot(right.x, right.y) * 60 / pxPerMm / 1000;
   assert.ok(launchSpeedMetersPerSecond > 1 && launchSpeedMetersPerSecond < 2);
   assert.ok(config.values.timing.subSteps >= 6);
   assert.ok(config.values.capacity.maxSpeed >= 46);
   assert.ok(config.values.autoLaunch.intervalMs > 0);
   assert.ok(config.values.autoLaunch.maxConcurrent > 0);
-  assert.ok(config.values.autoLaunch.angleJitterDegrees >= 0);
+  assert.ok(config.values.autoLaunch.angleJitterDegrees >= 0 && config.values.autoLaunch.angleJitterDegrees <= 0.5);
 });

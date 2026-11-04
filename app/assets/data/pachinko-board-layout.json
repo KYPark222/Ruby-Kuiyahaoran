@@ -356,69 +356,6 @@
       "kind": "upper"
     },
     {
-      "id": "upper-3-1",
-      "x": 305,
-      "y": 320,
-      "radius": 7,
-      "kind": "upper"
-    },
-    {
-      "id": "upper-3-2",
-      "x": 357,
-      "y": 320,
-      "radius": 7,
-      "kind": "upper"
-    },
-    {
-      "id": "upper-3-3",
-      "x": 409,
-      "y": 320,
-      "radius": 7,
-      "kind": "upper"
-    },
-    {
-      "id": "upper-3-4",
-      "x": 461,
-      "y": 320,
-      "radius": 7,
-      "kind": "upper"
-    },
-    {
-      "id": "upper-3-5",
-      "x": 513,
-      "y": 320,
-      "radius": 7,
-      "kind": "upper"
-    },
-    {
-      "id": "upper-3-6",
-      "x": 565,
-      "y": 320,
-      "radius": 7,
-      "kind": "upper"
-    },
-    {
-      "id": "upper-3-7",
-      "x": 617,
-      "y": 320,
-      "radius": 7,
-      "kind": "upper"
-    },
-    {
-      "id": "upper-3-8",
-      "x": 669,
-      "y": 320,
-      "radius": 7,
-      "kind": "upper"
-    },
-    {
-      "id": "upper-3-9",
-      "x": 721,
-      "y": 320,
-      "radius": 7,
-      "kind": "upper"
-    },
-    {
       "id": "lower-1-1",
       "x": 140,
       "y": 1177,
