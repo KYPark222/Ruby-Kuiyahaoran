@@ -7,13 +7,17 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "svg.board-component-map"
     assert_select "canvas[data-physics-canvas]"
-    assert_select ".physics-rail", count: 7
+    assert_select ".physics-rail", count: 10
     assert_select ".physics-rail#R002", count: 1
     assert_select ".physics-rail#R003", count: 1
     assert_select ".physics-rail#heso-funnel-left", count: 1
     assert_select ".physics-rail#heso-funnel-right", count: 1
-    assert_select "[data-physics-disabled='true']", count: 5
-    assert_select "#left-outer-rail[data-physics-disabled='true']", count: 1
+    assert_select ".physics-rail#lcd-collider", count: 1
+    assert_select ".physics-rail#lcd-side-guide-left", count: 1
+    assert_select ".physics-rail#lcd-side-guide-right", count: 1
+    assert_select "[data-physics-disabled='true']", count: 4
+    assert_select "#left-outer-rail[data-physics-disabled='true']", count: 0
+    assert_select ".physics-rail#left-outer-rail", count: 1
     assert_select ".lcd-guard[data-physics-disabled='true']", count: 4
     assert_select ".lcd-guard", count: 4
     assert_select ".physics-pin", minimum: 90

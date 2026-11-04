@@ -66,7 +66,7 @@ function createSvg() {
       points: [[78, 1300], [20, 1160], [5, 1000], [5, 840], [5, 650], [25, 500], [80, 400], [155, 350], [235, 300], [285, 260]]
     }),
     makeCurveElement({
-      id: "left-outer-rail", role: "outer-rail", disabled: true,
+      id: "left-outer-rail", role: "outer-rail",
       points: [[146, 404], [81, 512], [67, 699], [90, 867], [106, 988], [175, 1090], [292, 1187]]
     }),
     makeCurveElement({
@@ -99,6 +99,13 @@ function createSvg() {
   });
 
   boardLayout.entry.funnelWalls.forEach((rail) => {
+    paths.push(makeCurveElement({
+      id: rail.id, role: rail.role, points: rail.points,
+      thickness: rail.thickness, friction: rail.friction, frictionStatic: rail.frictionStatic
+    }));
+  });
+
+  [boardLayout.lcdProtection.collider, ...boardLayout.lcdProtection.sideGuides].forEach((rail) => {
     paths.push(makeCurveElement({
       id: rail.id, role: rail.role, points: rail.points,
       thickness: rail.thickness, friction: rail.friction, frictionStatic: rail.frictionStatic
@@ -146,7 +153,10 @@ test("creates a capped physics world and removes balls on request or after leavi
   assert.ok(railContacts > 0, "the launched ball should collide with the outer rail");
 
   assert.equal(simulation.engine.world.bodies.filter((body) => body.label === "lcd-guard").length, 0);
-  assert.equal(simulation.engine.world.bodies.filter((body) => body.label === "outer-rail").length, 0);
+  assert.ok(simulation.engine.world.bodies.filter((body) => body.label === "outer-rail").length > 0);
+  assert.ok(simulation.engine.world.bodies.some((body) => body.label === "lcd-collider"));
+  assert.ok(simulation.engine.world.bodies.some((body) => body.label === "lcd-side-guide-left"));
+  assert.ok(simulation.engine.world.bodies.some((body) => body.label === "lcd-side-guide-right"));
   assert.deepEqual(
     simulation.engine.world.bodies.filter((body) => body.label.startsWith("entry-guide:")).map((body) => body.label).sort(),
     ["entry-guide:left", "entry-guide:right"]
@@ -241,5 +251,35 @@ test("a launched game ball is not teleported to the heso and stays in play until
   const overall = simulation.stats.snapshot().overall;
   assert.equal(overall.completed, 1);
   assert.equal(overall.hits + overall.escaped, 1);
+  simulation.destroy();
+});
+
+function pointInPolygon(x, y, points) {
+  let inside = false;
+  for (let index = 0, previous = points.length - 1; index < points.length; previous = index, index += 1) {
+    const [xi, yi] = points[index];
+    const [xj, yj] = points[previous];
+    if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+}
+
+test("the LCD collider keeps balls out of the center display", () => {
+  const display = boardLayout.lcdProtection.collider.points.slice(0, -1);
+  const simulation = createSimulation({ Matter, svg: createSvg(), canvas: createCanvas() });
+  const ball = simulation.addBall({ x: 500, y: 300, velocity: { x: 0, y: 6 } });
+  let contacts = 0;
+  Matter.Events.on(simulation.engine, "collisionStart", ({ pairs }) => {
+    contacts += pairs.filter(({ bodyA, bodyB }) => bodyA.label === "lcd-collider" || bodyB.label === "lcd-collider").length;
+  });
+
+  let enteredDisplay = false;
+  for (let index = 0; index < 120 && simulation.ballCount > 0; index += 1) {
+    simulation.step();
+    if (pointInPolygon(ball.position.x, ball.position.y, display)) enteredDisplay = true;
+  }
+
+  assert.ok(contacts > 0, "the falling ball should collide with the LCD collider");
+  assert.equal(enteredDisplay, false, "the ball must stay outside the LCD area");
   simulation.destroy();
 });

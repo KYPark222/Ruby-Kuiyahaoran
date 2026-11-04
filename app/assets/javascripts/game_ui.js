@@ -55,9 +55,32 @@ document.addEventListener("DOMContentLoaded", () => {
   if (simulation) simulation.setStatsListener(renderPhysicsStats);
 
   if (simulation) {
+    const autoConfig = window.PachinkoPhysicsConfig?.values?.autoLaunch || { intervalMs: 1800, maxConcurrent: 3, angleJitterDegrees: 1.2 };
+    let autoStrength = window.PachinkoPhysicsConfig?.values?.launcher?.defaultStrength || "medium";
+    const initialHoldCount = Number(document.querySelector("#lcd-holds")?.dataset.holdCount);
+    if (Number.isFinite(initialHoldCount)) renderHoldCount(initialHoldCount);
+
+    function launchAutomatically() {
+      if (!simulation.isRunning || simulation.isDestroyed) return;
+      if (simulation.ballCount >= autoConfig.maxConcurrent) return;
+      const base = window.PachinkoPhysicsConfig.velocityForStrength(autoStrength);
+      const jitter = (Math.random() * 2 - 1) * autoConfig.angleJitterDegrees * Math.PI / 180;
+      const cos = Math.cos(jitter);
+      const sin = Math.sin(jitter);
+      simulation.launchBall({
+        kind: "game",
+        strength: autoStrength,
+        velocity: { x: base.x * cos - base.y * sin, y: base.x * sin + base.y * cos }
+      });
+    }
+
+    setInterval(launchAutomatically, autoConfig.intervalMs);
+    if (simulation.isRunning) setGameMessage("自動発射中");
+
     document.querySelectorAll("[data-launch-strength]").forEach((button) => {
       button.addEventListener("click", () => {
-        const ball = simulation.launchBall({ kind: "game", strength: button.dataset.launchStrength });
+        autoStrength = button.dataset.launchStrength;
+        const ball = simulation.launchBall({ kind: "game", strength: autoStrength });
         if (!ball) setGameMessage("玉の上限に達しています");
         else setGameMessage("発射中");
       });

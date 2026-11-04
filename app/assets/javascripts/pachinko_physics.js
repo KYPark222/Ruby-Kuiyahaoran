@@ -294,9 +294,9 @@
       return body;
     }
 
-    function launchBall({ kind = "ball", strength = CONFIG.launcher.defaultStrength, trackTrial = true, ...overrides } = {}) {
+    function launchBall({ kind = "ball", strength = CONFIG.launcher.defaultStrength, trackTrial = true, velocity: velocityOverride, ...overrides } = {}) {
       const position = options.launchPosition || CONFIG.launcher.position;
-      const velocity = options.launchVelocity || root.PachinkoPhysicsConfig.velocityForStrength(strength);
+      const velocity = velocityOverride || options.launchVelocity || root.PachinkoPhysicsConfig.velocityForStrength(strength);
       const ball = addBall({ x: position.x, y: position.y, radius: CONFIG.ball.radius, velocity, kind, strength, ...overrides });
       if (ball && trackTrial) registry.recordLaunch({
         ballId: ball.id,

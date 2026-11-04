@@ -18,7 +18,7 @@
 
       <g id="outer-guides" class="component-group component-rails" data-physics-group="rails" aria-label="外周レール">
         <path id="left-board-boundary" class="physics-rail" data-physics-role="board-boundary" d="M78 1300 C20 1160 5 1000 5 840 C5 650 25 500 80 400 C155 350 235 300 285 260"/>
-        <path id="left-outer-rail" class="physics-rail" data-physics-role="outer-rail" data-physics-disabled="true" d="M146 404 C81 512 67 699 90 867 C106 988 175 1090 292 1187"/>
+        <path id="left-outer-rail" class="physics-rail" data-physics-role="outer-rail" d="M146 404 C81 512 67 699 90 867 C106 988 175 1090 292 1187"/>
         <path id="right-outer-rail" class="physics-rail" data-physics-role="outer-rail" d="M869 403 C936 520 951 693 927 863 C910 986 844 1090 724 1187"/>
       </g>
 
@@ -44,6 +44,10 @@
         <path id="lcd-left-guard" class="lcd-guard" data-physics-role="lcd-guard" data-physics-disabled="true" d="M230 365 C215 410 192 450 166 574 C168 793 172 860 184 917 C189 935 194 948 199 960"/>
         <path id="lcd-right-guard" class="lcd-guard" data-physics-role="lcd-guard" data-physics-disabled="true" d="M832 365 C854 515 852 790 814 960"/>
         <path id="lcd-bottom-guard" class="lcd-guard" data-physics-role="lcd-guard" data-physics-disabled="true" d="M199 960 C350 1004 663 1004 814 960"/>
+        <% lcd_protection = board_layout.fetch("lcdProtection") %>
+        <% [lcd_protection.fetch("collider"), *lcd_protection.fetch("sideGuides")].each do |rail| %>
+          <polyline id="<%= rail.fetch("id") %>" class="physics-rail physics-hidden" data-physics-role="<%= rail.fetch("role") %>" data-physics-thickness="<%= rail.fetch("thickness") %>" data-physics-friction="<%= rail.fetch("friction") %>" data-physics-static-friction="<%= rail.fetch("frictionStatic") %>" points="<%= rail.fetch("points").map { |x, y| "#{x},#{y}" }.join(" ") %>" style="opacity:0;stroke:none" />
+        <% end %>
       </g>
 
       <g id="upper-pin-field" class="component-group component-pins" data-physics-group="upper-pins" aria-label="上部盤面釘">
@@ -95,7 +99,7 @@
       <div class="lcd-message" id="lcd-message" role="status">通常状態 <span>—</span> サンプル表示</div>
       <div class="lcd-bottomline">
         <span>保留</span>
-        <div class="lcd-holds" id="lcd-holds" aria-label="保留<%= @hold_count %>個"><% 4.times do |index| %><i class="<%= "hold-on" if index < @hold_count %>"></i><% end %></div>
+        <div class="lcd-holds" id="lcd-holds" data-hold-count="<%= @hold_count %>" aria-label="保留<%= @hold_count %>個"><% 4.times do |index| %><i class="<%= "hold-on" if index < @hold_count %>"></i><% end %></div>
         <span class="lcd-hint">静止画面</span>
       </div>
     </section>
@@ -111,6 +115,6 @@
   <div class="board-base-strip">
     <span>ORBIT / CUSTOM BOARD</span>
     <span class="base-leds"><i></i><i></i><i></i><i></i></span>
-    <span>BOARD VIEW / STATIC</span>
+    <span>BOARD VIEW / AUTO</span>
   </div>
 </section>

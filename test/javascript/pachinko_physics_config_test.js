@@ -29,6 +29,16 @@ test("keeps individually identified pins and the entry aperture in the board coo
     frictionStatic: 0, kind: "left-upper-return"
   });
   assert.deepEqual(boardLayout.returnRails.map(({ id }) => id), ["R002", "R003"]);
+  assert.equal(boardLayout.lcdProtection.collider.id, "lcd-collider");
+  assert.deepEqual(boardLayout.lcdProtection.collider.points.at(0), boardLayout.lcdProtection.collider.points.at(-1));
+  assert.deepEqual(
+    boardLayout.lcdProtection.sideGuides.map(({ id }) => id),
+    ["lcd-side-guide-left", "lcd-side-guide-right"]
+  );
+  const xs = boardLayout.lcdProtection.collider.points.map(([x]) => x);
+  const ys = boardLayout.lcdProtection.collider.points.map(([, y]) => y);
+  assert.ok(Math.min(...xs) >= 180 && Math.max(...xs) <= 840);
+  assert.ok(Math.min(...ys) >= 340 && Math.max(...ys) <= 1000);
   assert.ok(config.values.capacity.stallSteps > 0);
   assert.equal(config.values.entry.fallbackSteps, undefined);
 });
@@ -55,4 +65,7 @@ test("centralizes board units and provides distinct launch strengths without set
   assert.ok(mediumSpeedMetersPerSecond > 1 && mediumSpeedMetersPerSecond < 2);
   assert.ok(config.values.timing.subSteps >= 6);
   assert.ok(config.values.capacity.maxSpeed >= 46);
+  assert.ok(config.values.autoLaunch.intervalMs > 0);
+  assert.ok(config.values.autoLaunch.maxConcurrent > 0);
+  assert.ok(config.values.autoLaunch.angleJitterDegrees >= 0);
 });

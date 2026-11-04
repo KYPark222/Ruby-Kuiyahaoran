@@ -895,5 +895,52 @@
         "frictionStatic": 0
       }
     ]
+  },
+  "lcdProtection": {
+    "collider": {
+      "id": "lcd-collider",
+      "role": "lcd-collider",
+      "points": [
+        [510, 348],
+        [760, 366],
+        [810, 430],
+        [828, 650],
+        [832, 940],
+        [806, 985],
+        [214, 985],
+        [188, 940],
+        [192, 650],
+        [210, 430],
+        [260, 366],
+        [510, 348]
+      ],
+      "thickness": 7,
+      "friction": 0.005,
+      "frictionStatic": 0.005
+    },
+    "sideGuides": [
+      {
+        "id": "lcd-side-guide-left",
+        "role": "lcd-side-guide-left",
+        "points": [
+          [132, 975],
+          [262, 1055]
+        ],
+        "thickness": 7,
+        "friction": 0.005,
+        "frictionStatic": 0.005
+      },
+      {
+        "id": "lcd-side-guide-right",
+        "role": "lcd-side-guide-right",
+        "points": [
+          [900, 975],
+          [770, 1055]
+        ],
+        "thickness": 7,
+        "friction": 0.005,
+        "frictionStatic": 0.005
+      }
+    ]
   }
 }
