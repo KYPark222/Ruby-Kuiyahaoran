@@ -22,11 +22,12 @@
     rail: { thickness: 8, laneThickness: 5, restitution: 0.08, friction: 0.02, frictionStatic: 0.01, sampleGap: 10, segmentSizeFactor: 1.5 },
     lcdGuard: { thickness: 7, restitution: 0.15, friction: 0.005 },
     launcher: {
-      position: { x: 145, y: 1280 },
-      angleDegrees: -101.31,
-      defaultStrength: "medium",
-      // 実スケール（弱99.7 / 中115.6 / 強128.4）の1/3。中打ちは約1.6m/s。
-      speeds: { weak: 33.24, medium: 38.53, strong: 42.81 }
+      defaultMode: "left",
+      // 左右で同じ初速。実スケール中打ち115.6の1/3（約1.6m/s）に合わせています。
+      modes: {
+        left: { position: { x: 145, y: 1280 }, angleDegrees: -101.31, speed: 38.53 },
+        right: { position: { x: 870, y: 1280 }, angleDegrees: -78.69, speed: 38.53 }
+      }
     },
     entry: {
       selector: "[data-physics-role='entry-sensor']",
@@ -42,17 +43,23 @@
     return JSON.parse(JSON.stringify(value));
   }
 
-  function velocityForStrength(strength = CONFIG.launcher.defaultStrength) {
-    const speed = CONFIG.launcher.speeds[strength];
-    if (typeof speed !== "number") throw new RangeError(`Unknown launch strength: ${strength}`);
-    const radians = CONFIG.launcher.angleDegrees * Math.PI / 180;
-    return { x: Math.cos(radians) * speed, y: Math.sin(radians) * speed };
+  function launchMode(mode = CONFIG.launcher.defaultMode) {
+    const profile = CONFIG.launcher.modes[mode];
+    if (!profile) throw new RangeError(`Unknown launch mode: ${mode}`);
+    return profile;
+  }
+
+  function velocityForMode(mode = CONFIG.launcher.defaultMode) {
+    const profile = launchMode(mode);
+    const radians = profile.angleDegrees * Math.PI / 180;
+    return { x: Math.cos(radians) * profile.speed, y: Math.sin(radians) * profile.speed };
   }
 
   const api = Object.freeze({
     values: Object.freeze(CONFIG),
     copy,
-    velocityForStrength
+    launchMode,
+    velocityForMode
   });
   root.PachinkoPhysicsConfig = api;
   if (typeof module !== "undefined" && module.exports) module.exports = api;

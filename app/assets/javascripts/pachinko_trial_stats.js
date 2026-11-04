@@ -17,13 +17,13 @@
       return target;
     }
 
-    function recordLaunch({ ballId, strength, parameters }) {
+    function recordLaunch({ ballId, mode, parameters }) {
       if (attempts.has(ballId)) throw new Error(`Ball ${ballId} is already registered`);
       sequence += 1;
       const record = {
         id: `${timestamp()}-${sequence}`,
         ballId,
-        strength,
+        mode,
         parameters: JSON.parse(JSON.stringify(parameters)),
         launchedAt: timestamp(),
         outcome: null,
@@ -64,15 +64,15 @@
     }
 
     function snapshot() {
-      const byStrength = {};
-      for (const strength of new Set(events.map((record) => record.strength))) {
-        byStrength[strength] = aggregate(events.filter((record) => record.strength === strength));
+      const byMode = {};
+      for (const mode of new Set(events.map((record) => record.mode))) {
+        byMode[mode] = aggregate(events.filter((record) => record.mode === mode));
       }
       return {
         sessionId: `physics-${events[0]?.launchedAt || timestamp()}`,
         targetRatePercent: target,
         overall: aggregate(events),
-        byStrength,
+        byMode,
         trials: events.map((record) => ({ ...record, parameters: JSON.parse(JSON.stringify(record.parameters)) }))
       };
     }

@@ -143,19 +143,14 @@ h1 span { margin-left: 8px; color: #a6b2b8; font-size: 13px; font-weight: 400; }
 .hold-lights { display: flex; gap: 4px; }
 .hold-summary small { margin-left: auto; color: #84939a; font-size: 9px; }
 .control-panel { margin-top: auto; }
-.power-control { padding: 10px 9px; border: 1px solid #2a373f; border-radius: 5px; background: #0d1419; }
-.power-heading { display: flex; justify-content: space-between; color: #b6c1c5; font-size: 10px; }
-.power-heading output { color: var(--cyan); font: 15px Impact, "Arial Narrow", sans-serif; }
-.power-control input { width: 100%; margin: 11px 0 5px; accent-color: #27dfe8; }
-.power-scale { display: flex; justify-content: space-between; color: #718087; font-size: 9px; }
 .control-group { min-width: 0; margin: 10px 0 0; padding: 9px; border: 1px solid #2c3940; border-radius: 5px; }
 .control-group legend { padding: 0 4px; color: #aab7bc; font-size: 10px; }
-.strength-buttons { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+.strength-buttons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; }
 .strength-button, .action-button { min-width: 0; border: 1px solid #465159; border-radius: 4px; color: #b7c0c4; background: linear-gradient(#232d33, #11181d); font-size: 9px; }
 .strength-button { min-height: 38px; }
-.strength-button.weak { border-bottom: 2px solid #42bdcf; }
-.strength-button.medium { border-bottom: 2px solid #dfbb4f; }
-.strength-button.strong { border-bottom: 2px solid #e26258; }
+.strength-button.left { border-bottom: 2px solid #42bdcf; }
+.strength-button.right { border-bottom: 2px solid #e26258; }
+.strength-button.is-active { border-color: #f2c657; color: #fff2c2; background: linear-gradient(#33424a, #1b262c); box-shadow: inset 0 0 0 1px #f2c65755; }
 .control-group:disabled .strength-button, .control-group:disabled .action-button { opacity: .72; }
 .action-buttons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
 .action-button { min-height: 42px; padding: 6px 5px; font-weight: 700; }
@@ -175,7 +170,7 @@ h1 span { margin-left: 8px; color: #a6b2b8; font-size: 13px; font-weight: 400; }
 .physics-stat-grid div { padding: 5px; border-radius: 3px; background: #151f25; }
 .physics-stat-grid dt { color: #788890; font-size: 8px; }
 .physics-stat-grid dd { margin: 2px 0 0; color: #e2edf0; font: 12px Impact, "Arial Narrow", sans-serif; }
-.strength-trial-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; margin-top: 5px; }
+.strength-trial-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; margin-top: 5px; }
 .strength-trial-stats p { margin: 0; padding: 4px 2px; color: #88979d; background: #151f25; font-size: 8px; text-align: center; }
 .strength-trial-stats span { display: block; margin-top: 3px; color: #d9e6e9; font-variant-numeric: tabular-nums; }
 .calibration-note { margin: 6px 0 0; color: #728087; font-size: 8px; line-height: 1.45; }

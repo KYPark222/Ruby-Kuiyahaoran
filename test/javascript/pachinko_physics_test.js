@@ -1,6 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
-require("../../app/assets/javascripts/pachinko_physics_config.js");
+const config = require("../../app/assets/javascripts/pachinko_physics_config.js");
 require("../../app/assets/javascripts/pachinko_entry_detector.js");
 require("../../app/assets/javascripts/pachinko_trial_stats.js");
 const boardLayout = require("../../app/assets/data/pachinko-board-layout.json");
@@ -68,6 +68,14 @@ function createSvg() {
     makeCurveElement({
       id: "left-outer-rail", role: "outer-rail",
       points: [[146, 404], [81, 512], [67, 699], [90, 867], [106, 988], [175, 1090], [292, 1187]]
+    }),
+    makeCurveElement({
+      id: "right-outer-rail", role: "outer-rail",
+      points: [[869, 403], [936, 520], [951, 693], [927, 863], [910, 986], [844, 1090], [724, 1187]]
+    }),
+    makeCurveElement({
+      id: "right-board-boundary", role: "board-boundary",
+      points: [[937, 1300], [995, 1160], [1010, 1000], [1010, 840], [1010, 650], [990, 500], [935, 400], [860, 350], [780, 300], [730, 260]]
     }),
     makeCurveElement({
       id: "left-flow-lane-inner", role: "ball-lane-inner-edge", classes: [], disabled: true,
@@ -239,7 +247,7 @@ test("a ball dropped toward the heso follows the funnel and is accepted without 
 test("a launched game ball is not teleported to the heso and stays in play until it resolves", () => {
   const entries = [];
   const simulation = createSimulation({ Matter, svg: createSvg(), canvas: createCanvas(), options: { onEntry: (entry) => entries.push(entry) } });
-  const ball = simulation.launchBall({ kind: "game", strength: "weak" });
+  const ball = simulation.launchBall({ kind: "game", mode: "left" });
   assert.ok(ball.velocity.x < 0 && ball.velocity.y < 0);
 
   for (let index = 0; index < 10; index += 1) simulation.step();
@@ -251,6 +259,26 @@ test("a launched game ball is not teleported to the heso and stays in play until
   const overall = simulation.stats.snapshot().overall;
   assert.equal(overall.completed, 1);
   assert.equal(overall.hits + overall.escaped, 1);
+  simulation.destroy();
+});
+
+test("the right launch mode climbs the right rail and falls on the right side", () => {
+  const simulation = createSimulation({ Matter, svg: createSvg(), canvas: createCanvas() });
+  const mode = config.values.launcher.modes.right;
+  const ball = simulation.launchBall({ kind: "game", mode: "right" });
+
+  assert.equal(ball.position.x, mode.position.x);
+  assert.equal(ball.position.y, mode.position.y);
+  assert.ok(ball.velocity.x > 0 && ball.velocity.y < 0, "the right launch impulse should point up and right");
+
+  for (let index = 0; index < 120 && simulation.ballCount > 0; index += 1) simulation.step();
+  assert.ok(ball.position.x > config.values.viewBox.width / 2, "the right launch must stay on the right half of the board");
+
+  const remaining = runUntilSettled(simulation, 3000);
+  assert.equal(remaining, 0, "the right-launched ball should eventually enter the heso or drain");
+  const byMode = simulation.stats.snapshot().byMode;
+  assert.equal(byMode.right.completed, 1);
+  assert.equal(byMode.left, undefined);
   simulation.destroy();
 });
 

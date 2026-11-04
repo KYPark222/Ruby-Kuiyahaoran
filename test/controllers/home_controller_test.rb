@@ -7,7 +7,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "svg.board-component-map"
     assert_select "canvas[data-physics-canvas]"
-    assert_select ".physics-rail", count: 10
+    assert_select ".physics-rail", count: 11
     assert_select ".physics-rail#R002", count: 1
     assert_select ".physics-rail#R003", count: 1
     assert_select ".physics-rail#heso-funnel-left", count: 1
@@ -18,6 +18,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-physics-disabled='true']", count: 4
     assert_select "#left-outer-rail[data-physics-disabled='true']", count: 0
     assert_select ".physics-rail#left-outer-rail", count: 1
+    assert_select ".physics-rail#right-board-boundary[data-physics-role='board-boundary']", count: 1
     assert_select ".lcd-guard[data-physics-disabled='true']", count: 4
     assert_select ".lcd-guard", count: 4
     assert_select ".physics-pin", minimum: 90
@@ -39,16 +40,17 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select ".money-grid div", count: 4
     assert_select ".stat-grid div", count: 7
     assert_select ".history-list li", count: 3
-    assert_select ".strength-button", count: 3
+    assert_select ".strength-button", count: 2
+    assert_select "button[data-launch-mode='left']", text: "左打ち"
+    assert_select "button[data-launch-mode='right']", text: "右打ち"
     assert_select ".action-button", count: 4
     assert_select "fieldset[disabled]", count: 0
-    assert_select "input[type='range'][id='launch-power']"
+    assert_select "input[type='range'][id='launch-power']", count: 0
     assert_select "input[type='number'][id='target-hit-rate']", count: 1
     assert_select "button[id='apply-target-rate']", count: 1
     assert_select "#target-rate-status", /未設定/
-    assert_select "#physics-weak-stats"
-    assert_select "#physics-medium-stats"
-    assert_select "#physics-strong-stats"
+    assert_select "#physics-left-stats"
+    assert_select "#physics-right-stats"
     assert_select "script[src*='game_ui']"
     assert_select "script[src*='matter.min']"
     assert_select "script[src*='pachinko_physics_config']"

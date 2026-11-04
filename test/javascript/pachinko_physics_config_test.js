@@ -43,17 +43,22 @@ test("keeps individually identified pins and the entry aperture in the board coo
   assert.equal(config.values.entry.fallbackSteps, undefined);
 });
 
-test("centralizes board units and provides distinct launch strengths without setting a target rate", () => {
+test("centralizes board units and provides left and right launch modes without setting a target rate", () => {
   assert.deepEqual(config.values.viewBox, { width: 1015, height: 1550 });
-  assert.deepEqual(config.values.launcher.position, { x: 145, y: 1280 });
-  assert.equal(config.values.targetHitRatePercent, null);
-  const weak = config.velocityForStrength("weak");
-  const medium = config.velocityForStrength("medium");
-  const strong = config.velocityForStrength("strong");
-  assert.ok(weak.y < 0 && weak.x < 0);
-  assert.ok(Math.hypot(weak.x, weak.y) < Math.hypot(medium.x, medium.y));
-  assert.ok(Math.hypot(medium.x, medium.y) < Math.hypot(strong.x, strong.y));
-  assert.throws(() => config.velocityForStrength("turbo"), RangeError);
+  assert.equal(config.values.launcher.defaultMode, "left");
+  assert.deepEqual(config.values.targetHitRatePercent, null);
+  const leftMode = config.launchMode("left");
+  const rightMode = config.launchMode("right");
+  assert.deepEqual(leftMode.position, { x: 145, y: 1280 });
+  assert.deepEqual(rightMode.position, { x: 870, y: 1280 });
+  assert.equal(leftMode.position.x + rightMode.position.x, config.values.viewBox.width);
+
+  const left = config.velocityForMode("left");
+  const right = config.velocityForMode("right");
+  assert.ok(left.y < 0 && left.x < 0);
+  assert.ok(right.y < 0 && right.x > 0);
+  assert.equal(Math.hypot(left.x, left.y), Math.hypot(right.x, right.y));
+  assert.throws(() => config.velocityForMode("turbo"), RangeError);
 
   // 玉径11mm・表示半径8pxを基準にした実スケールを、視認性のため1/3スローで表示している
   const pxPerMm = config.values.ball.radius / 5.5;
@@ -61,8 +66,8 @@ test("centralizes board units and provides distinct launch strengths without set
   const realGravityScale = 9.80665 * pxPerMm * 1000 / 1e6;
   const expectedGravityScale = realGravityScale / (slowMotion * slowMotion);
   assert.ok(Math.abs(config.values.engine.gravity.scale - expectedGravityScale) / expectedGravityScale < 0.01);
-  const mediumSpeedMetersPerSecond = Math.hypot(medium.x, medium.y) * 60 / pxPerMm / 1000;
-  assert.ok(mediumSpeedMetersPerSecond > 1 && mediumSpeedMetersPerSecond < 2);
+  const launchSpeedMetersPerSecond = Math.hypot(left.x, left.y) * 60 / pxPerMm / 1000;
+  assert.ok(launchSpeedMetersPerSecond > 1 && launchSpeedMetersPerSecond < 2);
   assert.ok(config.values.timing.subSteps >= 6);
   assert.ok(config.values.capacity.maxSpeed >= 46);
   assert.ok(config.values.autoLaunch.intervalMs > 0);

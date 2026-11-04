@@ -1,13 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const power = document.querySelector("#launch-power");
-  const readout = document.querySelector("#power-readout");
-
-  if (power && readout) {
-    power.addEventListener("input", () => {
-      readout.value = `${power.value}%`;
-    });
-  }
-
   const board = document.querySelector("[data-board-scene]");
   const simulation = board ? window.PachinkoPhysics?.get(board) : null;
   const targetInput = document.querySelector("#target-hit-rate");
@@ -167,9 +158,9 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector("#physics-rate-difference").textContent = overall.differencePercentagePoints === null
       ? "—"
       : `${overall.differencePercentagePoints > 0 ? "+" : ""}${overall.differencePercentagePoints.toFixed(2)}pt`;
-    ["weak", "medium", "strong"].forEach((strength) => {
-      const result = stats.byStrength[strength] || { completed: 0, hits: 0, measuredRatePercent: null };
-      document.querySelector(`#physics-${strength}-stats`).textContent = result.measuredRatePercent === null
+    ["left", "right"].forEach((mode) => {
+      const result = stats.byMode[mode] || { completed: 0, hits: 0, measuredRatePercent: null };
+      document.querySelector(`#physics-${mode}-stats`).textContent = result.measuredRatePercent === null
         ? `${result.completed}件 / —`
         : `${result.hits}/${result.completed}件・${result.measuredRatePercent.toFixed(1)}%`;
     });
@@ -179,7 +170,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (simulation) {
     const autoConfig = window.PachinkoPhysicsConfig?.values?.autoLaunch || { intervalMs: 1000, maxConcurrent: 10, angleJitterDegrees: 1.2 };
-    let autoStrength = window.PachinkoPhysicsConfig?.values?.launcher?.defaultStrength || "medium";
+    let autoMode = window.PachinkoPhysicsConfig?.values?.launcher?.defaultMode || "left";
+
+    function renderLaunchMode() {
+      document.querySelectorAll("[data-launch-mode]").forEach((button) => {
+        const active = button.dataset.launchMode === autoMode;
+        button.classList.toggle("is-active", active);
+        button.setAttribute("aria-pressed", String(active));
+      });
+    }
+
+    renderLaunchMode();
     const initialHoldCount = Number(document.querySelector("#lcd-holds")?.dataset.holdCount);
     if (Number.isFinite(initialHoldCount)) {
       renderHoldCount(initialHoldCount);
@@ -192,13 +193,13 @@ document.addEventListener("DOMContentLoaded", () => {
     function launchAutomatically() {
       if (!simulation.isRunning || simulation.isDestroyed) return;
       if (simulation.ballCount >= autoConfig.maxConcurrent) return;
-      const base = window.PachinkoPhysicsConfig.velocityForStrength(autoStrength);
+      const base = window.PachinkoPhysicsConfig.velocityForMode(autoMode);
       const jitter = (Math.random() * 2 - 1) * autoConfig.angleJitterDegrees * Math.PI / 180;
       const cos = Math.cos(jitter);
       const sin = Math.sin(jitter);
       simulation.launchBall({
         kind: "game",
-        strength: autoStrength,
+        mode: autoMode,
         velocity: { x: base.x * cos - base.y * sin, y: base.x * sin + base.y * cos }
       });
     }
@@ -206,12 +207,13 @@ document.addEventListener("DOMContentLoaded", () => {
     setInterval(launchAutomatically, autoConfig.intervalMs);
     if (simulation.isRunning) setGameMessage("自動発射中");
 
-    document.querySelectorAll("[data-launch-strength]").forEach((button) => {
+    document.querySelectorAll("[data-launch-mode]").forEach((button) => {
       button.addEventListener("click", () => {
-        autoStrength = button.dataset.launchStrength;
-        const ball = simulation.launchBall({ kind: "game", strength: autoStrength });
+        autoMode = button.dataset.launchMode;
+        renderLaunchMode();
+        const ball = simulation.launchBall({ kind: "game", mode: autoMode });
         if (!ball) setGameMessage("玉の上限に達しています");
-        else setGameMessage("発射中");
+        else setGameMessage(autoMode === "left" ? "左打ちで発射" : "右打ちで発射");
       });
     });
 

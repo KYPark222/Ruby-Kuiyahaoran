@@ -59,18 +59,11 @@
       <section class="operation-panel control-panel">
         <header class="panel-heading"><div><span class="panel-kicker">PLAYER CONTROLS</span><h2>操作パネル</h2></div><span class="sample-tag">接続中</span></header>
 
-        <div class="power-control">
-          <div class="power-heading"><label for="launch-power">発射強度</label><output id="power-readout" for="launch-power">62%</output></div>
-          <input id="launch-power" type="range" min="0" max="100" value="62" aria-describedby="controls-note">
-          <div class="power-scale"><span>弱</span><span>中</span><span>強</span></div>
-        </div>
-
         <fieldset class="control-group" aria-describedby="controls-note">
-          <legend>打ち出し強度</legend>
+          <legend>打ち出し</legend>
           <div class="strength-buttons">
-            <button type="button" class="strength-button weak" data-launch-strength="weak">弱打ち</button>
-            <button type="button" class="strength-button medium" data-launch-strength="medium">中打ち</button>
-            <button type="button" class="strength-button strong" data-launch-strength="strong">強打ち</button>
+            <button type="button" class="strength-button left" data-launch-mode="left" aria-pressed="true">左打ち</button>
+            <button type="button" class="strength-button right" data-launch-mode="right" aria-pressed="false">右打ち</button>
           </div>
         </fieldset>
 
@@ -83,7 +76,7 @@
             <button type="button" class="action-button investment-button">＋ <span>追加投資</span></button>
           </div>
         </fieldset>
-        <p id="controls-note" class="controls-note">自動で玉を発射します。手動ボタンで強度を変えられます。ヘソ入賞で抽選し、保留上限は4個です。</p>
+        <p id="controls-note" class="controls-note">自動で玉を発射します。左打ち・右打ちを切り替えられます。ヘソ入賞で抽選し、保留上限は4個です。</p>
 
         <details class="physics-calibration">
           <summary>物理検証・入賞率</summary>
@@ -100,10 +93,9 @@
             <div><dt>実測率</dt><dd id="physics-rate">—</dd></div>
             <div><dt>目標差</dt><dd id="physics-rate-difference">—</dd></div>
           </dl>
-          <div class="strength-trial-stats" aria-label="発射強度別の試行結果">
-            <p>弱 <span id="physics-weak-stats">0件 / —</span></p>
-            <p>中 <span id="physics-medium-stats">0件 / —</span></p>
-            <p>強 <span id="physics-strong-stats">0件 / —</span></p>
+          <div class="strength-trial-stats" aria-label="打ち出し別の試行結果">
+            <p>左 <span id="physics-left-stats">0件 / —</span></p>
+            <p>右 <span id="physics-right-stats">0件 / —</span></p>
           </div>
           <p class="calibration-note">完了試行は入賞または排出。流下中・取消は実測率の分母に含めません。</p>
         </details>

@@ -10,7 +10,7 @@
   const MAX_FRAME_MS = CONFIG.timing.maxFrameMs;
   const MAX_SPEED = CONFIG.capacity.maxSpeed;
   const MAX_BALLS = CONFIG.capacity.maxBalls;
-  const DEFAULT_LAUNCH = { ...CONFIG.launcher.position, velocity: root.PachinkoPhysicsConfig.velocityForStrength() };
+  const DEFAULT_LAUNCH = { ...root.PachinkoPhysicsConfig.launchMode().position, velocity: root.PachinkoPhysicsConfig.velocityForMode() };
   const instances = new WeakMap();
 
   function createSimulation({ Matter, svg, canvas, options = {} }) {
@@ -223,8 +223,8 @@
         context.stroke();
       }
 
-      const launchPosition = options.launchPosition || CONFIG.launcher.position;
-      const launchVelocity = options.launchVelocity || root.PachinkoPhysicsConfig.velocityForStrength();
+      const launchPosition = options.launchPosition || root.PachinkoPhysicsConfig.launchMode().position;
+      const launchVelocity = options.launchVelocity || root.PachinkoPhysicsConfig.velocityForMode();
       context.beginPath();
       context.arc(launchPosition.x, launchPosition.y, CONFIG.ball.radius, 0, Math.PI * 2);
       context.moveTo(launchPosition.x, launchPosition.y);
@@ -278,7 +278,7 @@
       });
     }
 
-    function addBall({ x = DEFAULT_LAUNCH.x, y = DEFAULT_LAUNCH.y, radius = CONFIG.ball.radius, kind = "test", strength = null, velocity } = {}) {
+    function addBall({ x = DEFAULT_LAUNCH.x, y = DEFAULT_LAUNCH.y, radius = CONFIG.ball.radius, kind = "test", mode = null, velocity } = {}) {
       if (destroyed || ballBodies.size >= MAX_BALLS) return null;
       const body = Bodies.circle(x, y, radius, {
         label: `ball:${kind}`,
@@ -289,18 +289,19 @@
         density: CONFIG.ball.density
       });
       if (velocity) Body.setVelocity(body, velocity);
-      ballBodies.set(body.id, { body, radius, kind, strength, state: "falling", stallSteps: 0 });
+      ballBodies.set(body.id, { body, radius, kind, mode, state: "falling", stallSteps: 0 });
       Composite.add(engine.world, body);
       return body;
     }
 
-    function launchBall({ kind = "ball", strength = CONFIG.launcher.defaultStrength, trackTrial = true, velocity: velocityOverride, ...overrides } = {}) {
-      const position = options.launchPosition || CONFIG.launcher.position;
-      const velocity = velocityOverride || options.launchVelocity || root.PachinkoPhysicsConfig.velocityForStrength(strength);
-      const ball = addBall({ x: position.x, y: position.y, radius: CONFIG.ball.radius, velocity, kind, strength, ...overrides });
+    function launchBall({ kind = "ball", mode = CONFIG.launcher.defaultMode, trackTrial = true, velocity: velocityOverride, position: positionOverride, ...overrides } = {}) {
+      const profile = root.PachinkoPhysicsConfig.launchMode(mode);
+      const position = positionOverride || options.launchPosition || profile.position;
+      const velocity = velocityOverride || options.launchVelocity || root.PachinkoPhysicsConfig.velocityForMode(mode);
+      const ball = addBall({ x: position.x, y: position.y, radius: CONFIG.ball.radius, velocity, kind, mode, ...overrides });
       if (ball && trackTrial) registry.recordLaunch({
         ballId: ball.id,
-        strength,
+        mode,
         parameters: {
           launcher: { position: { x: ball.position.x, y: ball.position.y }, angleDegrees: Math.atan2(velocity.y, velocity.x) * 180 / Math.PI, velocity: { ...velocity } },
           timing: { stepMs: STEP_MS, subSteps: SUB_STEPS },
