@@ -33,7 +33,7 @@
       ballClearance: 0,
       guideWalls: { offsetX: 26, startY: -15, endY: 18, thickness: 6 }
     },
-    autoLaunch: { intervalMs: 1800, maxConcurrent: 3, angleJitterDegrees: 1.2 },
+    autoLaunch: { intervalMs: 1000, maxConcurrent: 10, angleJitterDegrees: 1.2 },
     exit: { margin: 8 },
     targetHitRatePercent: null
   };

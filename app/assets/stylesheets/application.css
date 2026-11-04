@@ -101,6 +101,20 @@ h1 span { margin-left: 8px; color: #a6b2b8; font-size: 13px; font-weight: 400; }
 .symbol-column:nth-child(2) strong { color: #c8ffff; text-shadow: 0 0 3px #fff, 0 0 13px #35f5ff, 0 0 28px #008bff; }
 .symbol-column:nth-child(3) strong { color: #ffe1f7; text-shadow: 0 0 3px #fff, 0 0 13px #ff68d8, 0 0 28px #9e47ff; }
 .neighbor-symbol { color: #d5f5fa; font: 12px Impact, "Arial Narrow", sans-serif; opacity: .42; text-shadow: 0 0 8px #58d9ff; }
+#symbol-reels.is-spinning .symbol-column strong { animation: reel-spin-blur .12s linear infinite alternate; }
+.symbol-column.is-stopped strong { animation: reel-stop-flash .3s ease-out; }
+#symbol-reels.is-jackpot .symbol-column strong { color: #fff; text-shadow: 0 0 6px #fff, 0 0 18px #ffd34a, 0 0 42px #ff4b00; animation: reel-jackpot-pulse .55s ease-in-out infinite alternate; }
+#symbol-reels.is-miss .symbol-column strong { animation: reel-miss-settle .35s ease-out; }
+#lcd-interface[data-lcd-state="spinning"] .lcd-mode { color: #baf6ff; }
+#lcd-interface[data-lcd-state="spinning"] .lcd-mode i { animation: lcd-mode-pulse .35s linear infinite alternate; }
+#lcd-interface[data-lcd-state="jackpot"] .lcd-mode { color: #ffd96b; }
+#lcd-interface[data-lcd-state="jackpot"] .lcd-mode i { background: #ffd96b; box-shadow: 0 0 12px #ffd96b; }
+#lcd-interface[data-lcd-state="jackpot"] .lcd-message { color: #fff4c4; text-shadow: 0 0 8px #fff, 0 0 20px #ffc400, 0 0 36px #ff5a00; }
+@keyframes reel-spin-blur { from { opacity: .45; filter: blur(.3px); transform: translateY(-10%); } to { opacity: 1; filter: blur(1.6px); transform: translateY(10%); } }
+@keyframes reel-stop-flash { 0% { transform: scale(1.28); } 60% { transform: scale(.94); } 100% { transform: scale(1); } }
+@keyframes reel-jackpot-pulse { from { transform: scale(1); filter: brightness(1); } to { transform: scale(1.12); filter: brightness(1.45); } }
+@keyframes reel-miss-settle { 0% { transform: translateX(-3px); } 50% { transform: translateX(3px); } 100% { transform: translateX(0); } }
+@keyframes lcd-mode-pulse { from { opacity: .25; } to { opacity: 1; } }
 .lcd-message { padding: 4px 8px; border: 0; color: #efffff; background: transparent; text-align: center; font-size: clamp(9px, 1.3vw, 13px); letter-spacing: .06em; text-shadow: 0 1px 4px #001019, 0 0 10px #1fdfff; }
 .lcd-message span { margin: 0 6px; color: #54e9ef; }
 .lcd-holds { display: flex; gap: 5px; }
@@ -195,4 +209,14 @@ h1 span { margin-left: 8px; color: #a6b2b8; font-size: 13px; font-weight: 400; }
   .data-sidebar { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); align-items: start; }
   .balance-panel, .history-panel { grid-column: 1 / -1; }
   .simulator-footer { flex-direction: column; gap: 5px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #symbol-reels.is-spinning .symbol-column strong,
+  .symbol-column.is-stopped strong,
+  #symbol-reels.is-jackpot .symbol-column strong,
+  #symbol-reels.is-miss .symbol-column strong,
+  #lcd-interface[data-lcd-state="spinning"] .lcd-mode i {
+    animation: none;
+  }
 }

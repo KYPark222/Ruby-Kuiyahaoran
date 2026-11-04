@@ -11,5 +11,6 @@ Rails.application.routes.draw do
 
   root "home#index"
   post "pachinko/entry", to: "pachinko_entries#create", as: :pachinko_entry
+  post "pachinko/consume", to: "pachinko_entries#consume", as: :pachinko_consume
   post "pachinko/reset", to: "pachinko_entries#reset", as: :pachinko_reset
 end

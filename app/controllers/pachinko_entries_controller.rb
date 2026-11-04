@@ -21,8 +21,17 @@ class PachinkoEntriesController < ApplicationController
 
     hold_count += 1
     session[:pachinko_hold_count] = hold_count
+    render json: { accepted: true, duplicate: false, hold_count: hold_count }
+  end
+
+  def consume
+    hold_count = current_hold_count
+    return render json: { consumed: false, hold_count: hold_count }, status: :ok if hold_count.zero?
+
+    hold_count -= 1
+    session[:pachinko_hold_count] = hold_count
     jackpot = Random.rand(JACKPOT_DENOMINATOR).zero?
-    render json: { accepted: true, duplicate: false, hold_count: hold_count, result: jackpot ? "jackpot" : "miss" }
+    render json: { consumed: true, hold_count: hold_count, result: jackpot ? "jackpot" : "miss" }
   end
 
   def reset
