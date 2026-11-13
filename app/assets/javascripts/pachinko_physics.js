@@ -10,7 +10,7 @@
   const MAX_FRAME_MS = CONFIG.timing.maxFrameMs;
   const MAX_SPEED = CONFIG.capacity.maxSpeed;
   const MAX_BALLS = CONFIG.capacity.maxBalls;
-  const DEFAULT_LAUNCH = { ...CONFIG.launcher.position, velocity: root.PachinkoPhysicsConfig.velocityForStrength() };
+  const DEFAULT_LAUNCH = { ...root.PachinkoPhysicsConfig.launchMode().position, velocity: root.PachinkoPhysicsConfig.velocityForMode() };
   const instances = new WeakMap();
 
   function createSimulation({ Matter, svg, canvas, options = {} }) {
@@ -55,6 +55,9 @@
       const length = Math.hypot(dx, dy);
       if (length < 1) return;
 
+      const segmentRestitution = collisionOptions.restitution ?? options.railRestitution ?? CONFIG.rail.restitution;
+      const segmentFriction = collisionOptions.friction ?? options.railFriction ?? CONFIG.rail.friction;
+      const segmentStaticFriction = collisionOptions.frictionStatic ?? options.railStaticFriction ?? CONFIG.rail.frictionStatic;
       const segment = Bodies.rectangle(
         (start.x + end.x) / 2,
         (start.y + end.y) / 2,
@@ -64,10 +67,15 @@
           isStatic: true,
           angle: Math.atan2(dy, dx),
           label,
-          restitution: collisionOptions.restitution ?? options.railRestitution ?? CONFIG.rail.restitution,
-          friction: collisionOptions.friction ?? options.railFriction ?? CONFIG.rail.friction
+          chamfer: { radius: thickness / 2 },
+          restitution: segmentRestitution,
+          friction: segmentFriction,
+          frictionStatic: segmentStaticFriction
         }
       );
+      segment.restitution = segmentRestitution;
+      segment.friction = segmentFriction;
+      segment.frictionStatic = segmentStaticFriction;
       Composite.add(engine.world, segment);
     }
 
@@ -86,9 +94,31 @@
       addStaticSegment(previous, last, thickness, label, collisionOptions);
     }
 
+    if (aperture) {
+      const { offsetX, startY, endY, thickness } = CONFIG.entry.guideWalls;
+      [-1, 1].forEach((direction) => {
+        const x = aperture.cx + direction * offsetX;
+        addStaticSegment(
+          { x, y: aperture.cy + startY },
+          { x, y: aperture.cy + endY },
+          thickness,
+          `entry-guide:${direction < 0 ? "left" : "right"}`,
+          { restitution: CONFIG.rail.restitution, friction: CONFIG.rail.friction }
+        );
+      });
+    }
+
     svg.querySelectorAll(".physics-pin").forEach((pin) => {
+      if (pin.getAttribute("data-physics-disabled") === "true") return;
       const visualRadius = Number(pin.getAttribute("r")) || CONFIG.pin.radius + CONFIG.pin.visualClearance;
-      const radius = Math.max(1, Math.min(options.pinRadius ?? CONFIG.pin.radius, visualRadius - CONFIG.pin.visualClearance));
+      const physicalRadius = Number(pin.getAttribute("data-physical-radius")) || CONFIG.pin.radius;
+      const radius = Math.max(1, Math.min(options.pinRadius ?? physicalRadius, visualRadius - CONFIG.pin.visualClearance));
+      const pinRestitutionAttribute = pin.getAttribute("data-physical-restitution");
+      const pinFrictionAttribute = pin.getAttribute("data-physical-friction");
+      const pinStaticFrictionAttribute = pin.getAttribute("data-physical-static-friction");
+      const restitution = pinRestitutionAttribute == null || pinRestitutionAttribute === "" ? CONFIG.pin.restitution : Number(pinRestitutionAttribute);
+      const friction = pinFrictionAttribute == null || pinFrictionAttribute === "" ? CONFIG.pin.friction : Number(pinFrictionAttribute);
+      const frictionStatic = pinStaticFrictionAttribute == null || pinStaticFrictionAttribute === "" ? CONFIG.pin.friction : Number(pinStaticFrictionAttribute);
       const body = Bodies.circle(
         Number(pin.getAttribute("cx")),
         Number(pin.getAttribute("cy")),
@@ -96,18 +126,28 @@
         {
           isStatic: true,
           label: `pin:${pin.id}`,
-          restitution: options.pinRestitution ?? CONFIG.pin.restitution,
-          friction: options.pinFriction ?? CONFIG.pin.friction
+          restitution: options.pinRestitution ?? restitution,
+          friction: options.pinFriction ?? friction,
+          frictionStatic: frictionStatic
         }
       );
+      body.restitution = options.pinRestitution ?? restitution;
+      body.friction = options.pinFriction ?? friction;
+      body.frictionStatic = frictionStatic;
       Composite.add(engine.world, body);
     });
 
-    svg.querySelectorAll(".physics-rail, [data-physics-role='right-strike-lane-edge'], .lcd-guard").forEach((path) => {
-      const isRail = path.classList.contains("physics-rail");
+    svg.querySelectorAll(".physics-rail, .physics-lane, [data-physics-role='right-strike-lane-edge'], .lcd-guard").forEach((path) => {
+      if (path.getAttribute("data-physics-disabled") === "true") return;
+      const isRail = path.classList.contains("physics-rail") || path.classList.contains("physics-lane");
       const isLcdGuard = path.classList.contains("lcd-guard");
+      const specifiedThickness = Number(path.getAttribute("data-physics-thickness")) || null;
+      const frictionAttribute = path.getAttribute("data-physics-friction");
+      const staticFrictionAttribute = path.getAttribute("data-physics-static-friction");
+      const specifiedFriction = frictionAttribute === null || frictionAttribute === "" ? null : Number(frictionAttribute);
+      const specifiedStaticFriction = staticFrictionAttribute === null || staticFrictionAttribute === "" ? null : Number(staticFrictionAttribute);
       const thickness = isRail
-        ? (options.railThickness ?? CONFIG.rail.thickness)
+        ? (options.railThickness ?? specifiedThickness ?? CONFIG.rail.thickness)
         : (isLcdGuard ? (options.lcdGuardThickness ?? CONFIG.lcdGuard.thickness) : (options.laneThickness ?? CONFIG.rail.laneThickness));
       addPathSegments(path, thickness, path.dataset.physicsRole || "lane-edge", {
         restitution: isLcdGuard
@@ -115,7 +155,10 @@
           : (options.railRestitution ?? CONFIG.rail.restitution),
         friction: isLcdGuard
           ? (options.lcdGuardFriction ?? CONFIG.lcdGuard.friction)
-          : (options.railFriction ?? CONFIG.rail.friction)
+          : (options.railFriction ?? (Number.isFinite(specifiedFriction) ? specifiedFriction : CONFIG.rail.friction)),
+        frictionStatic: isLcdGuard
+          ? (options.lcdGuardStaticFriction ?? CONFIG.lcdGuard.friction)
+          : (options.railStaticFriction ?? (Number.isFinite(specifiedStaticFriction) ? specifiedStaticFriction : CONFIG.rail.frictionStatic))
       });
     });
 
@@ -180,8 +223,8 @@
         context.stroke();
       }
 
-      const launchPosition = options.launchPosition || CONFIG.launcher.position;
-      const launchVelocity = options.launchVelocity || root.PachinkoPhysicsConfig.velocityForStrength();
+      const launchPosition = options.launchPosition || root.PachinkoPhysicsConfig.launchMode().position;
+      const launchVelocity = options.launchVelocity || root.PachinkoPhysicsConfig.velocityForMode();
       context.beginPath();
       context.arc(launchPosition.x, launchPosition.y, CONFIG.ball.radius, 0, Math.PI * 2);
       context.moveTo(launchPosition.x, launchPosition.y);
@@ -213,6 +256,19 @@
       return true;
     }
 
+    function resolveEntry(body) {
+      const ball = ballBodies.get(body.id);
+      if (!ball || ball.state !== "falling" || !aperture) return false;
+      ball.state = "entered";
+      if (!removeBall(body, "hit")) return false;
+      const detail = { ballId: String(body.id) };
+      if (typeof options.onEntry === "function") options.onEntry(detail);
+      if (root.document && typeof root.CustomEvent === "function") {
+        root.document.dispatchEvent(new root.CustomEvent("pachinko:entry", { detail }));
+      }
+      return true;
+    }
+
     function cullEscapedBalls() {
       ballBodies.forEach(({ body, radius }) => {
         const { x, y } = body.position;
@@ -222,7 +278,7 @@
       });
     }
 
-    function addBall({ x = DEFAULT_LAUNCH.x, y = DEFAULT_LAUNCH.y, radius = CONFIG.ball.radius, kind = "test", strength = null, velocity } = {}) {
+    function addBall({ x = DEFAULT_LAUNCH.x, y = DEFAULT_LAUNCH.y, radius = CONFIG.ball.radius, kind = "test", mode = null, velocity } = {}) {
       if (destroyed || ballBodies.size >= MAX_BALLS) return null;
       const body = Bodies.circle(x, y, radius, {
         label: `ball:${kind}`,
@@ -233,18 +289,19 @@
         density: CONFIG.ball.density
       });
       if (velocity) Body.setVelocity(body, velocity);
-      ballBodies.set(body.id, { body, radius, kind, strength, state: "falling" });
+      ballBodies.set(body.id, { body, radius, kind, mode, state: "falling", stallSteps: 0 });
       Composite.add(engine.world, body);
       return body;
     }
 
-    function launchBall({ kind = "ball", strength = CONFIG.launcher.defaultStrength, trackTrial = true, ...overrides } = {}) {
-      const position = options.launchPosition || CONFIG.launcher.position;
-      const velocity = options.launchVelocity || root.PachinkoPhysicsConfig.velocityForStrength(strength);
-      const ball = addBall({ x: position.x, y: position.y, radius: CONFIG.ball.radius, velocity, kind, strength, ...overrides });
+    function launchBall({ kind = "ball", mode = CONFIG.launcher.defaultMode, trackTrial = true, velocity: velocityOverride, position: positionOverride, ...overrides } = {}) {
+      const profile = root.PachinkoPhysicsConfig.launchMode(mode);
+      const position = positionOverride || options.launchPosition || profile.position;
+      const velocity = velocityOverride || options.launchVelocity || root.PachinkoPhysicsConfig.velocityForMode(mode);
+      const ball = addBall({ x: position.x, y: position.y, radius: CONFIG.ball.radius, velocity, kind, mode, ...overrides });
       if (ball && trackTrial) registry.recordLaunch({
         ballId: ball.id,
-        strength,
+        mode,
         parameters: {
           launcher: { position: { x: ball.position.x, y: ball.position.y }, angleDegrees: Math.atan2(velocity.y, velocity.x) * 180 / Math.PI, velocity: { ...velocity } },
           timing: { stepMs: STEP_MS, subSteps: SUB_STEPS },
@@ -267,16 +324,18 @@
       for (let substep = 0; substep < SUB_STEPS; substep += 1) {
         const previous = new Map([...ballBodies].map(([id, { body }]) => [id, { x: body.position.x, y: body.position.y }]));
         Engine.update(engine, STEP_MS / SUB_STEPS);
-        ballBodies.forEach(({ body }) => {
+        ballBodies.forEach((ball) => {
+          const { body } = ball;
           const speed = Math.hypot(body.velocity.x, body.velocity.y);
           if (speed > MAX_SPEED) {
             Body.setVelocity(body, { x: body.velocity.x * MAX_SPEED / speed, y: body.velocity.y * MAX_SPEED / speed });
           }
           if (aperture && ENTRY.passedThrough(previous.get(body.id), body.position, aperture, ballBodies.get(body.id).radius, CONFIG.entry.ballClearance)) {
-            ballBodies.get(body.id).state = "entered";
-            removeBall(body, "hit");
-            if (typeof options.onEntry === "function") options.onEntry(body);
+            resolveEntry(body);
+            return;
           }
+          ball.stallSteps = speed < CONFIG.capacity.stallSpeed ? ball.stallSteps + 1 : 0;
+          if (ball.stallSteps >= CONFIG.capacity.stallSteps) removeBall(body, "escaped");
         });
       }
       cullEscapedBalls();
@@ -387,7 +446,6 @@
       if (destroyed) instances.delete(board);
       return destroyed;
     };
-    simulation.launchBall({ radius: CONFIG.ball.radius, kind: "test", trackTrial: false });
     simulation.render();
     simulation.start();
     return simulation;
