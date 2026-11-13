@@ -74,6 +74,15 @@ test("centralizes board units and provides left and right launch modes without s
   assert.ok(config.values.timing.subSteps >= 6);
   assert.ok(config.values.capacity.maxSpeed >= 46);
   assert.ok(config.values.autoLaunch.intervalMs > 0);
-  assert.ok(config.values.autoLaunch.maxConcurrent > 0);
+  assert.ok(config.values.autoLaunch.maxConcurrent >= 20);
   assert.ok(config.values.autoLaunch.angleJitterDegrees >= 0 && config.values.autoLaunch.angleJitterDegrees <= 0.5);
+});
+
+test("launches 100 balls per minute and keeps firing for at least 0.6 seconds after stop", () => {
+  // 1分間100発 = 600ms間隔
+  assert.equal(config.values.autoLaunch.intervalMs, 600);
+  assert.equal(60000 / config.values.autoLaunch.intervalMs, 100);
+  assert.ok(config.values.autoLaunch.stopDelayMs >= 600);
+  assert.equal(config.values.autoLaunch.holdLimit, 4);
+  assert.equal(config.values.autoLaunch.resumeHoldCount, 3);
 });

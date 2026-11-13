@@ -36,7 +36,16 @@
       ballClearance: 0,
       guideWalls: { offsetX: 26, startY: -15, endY: 18, thickness: 6 }
     },
-    autoLaunch: { intervalMs: 1000, maxConcurrent: 10, angleJitterDegrees: 0.2 },
+    // 1分間100発（約0.6秒に1発）。ストップボタンは最低0.6秒間は発射を
+    // 止めず、保留が4個で自動停止、3個以下で自動再開します。
+    autoLaunch: {
+      intervalMs: 600,
+      stopDelayMs: 600,
+      holdLimit: 4,
+      resumeHoldCount: 3,
+      maxConcurrent: 20,
+      angleJitterDegrees: 0.2
+    },
     exit: { margin: 8 },
     targetHitRatePercent: null
   };

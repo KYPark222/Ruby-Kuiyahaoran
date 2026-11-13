@@ -48,6 +48,18 @@ class PachinkoEntriesControllerTest < ActionDispatch::IntegrationTest
     assert_equal 0, response.parsed_body["hold_count"]
   end
 
+  test "consumes a hold without drawing when draw is false" do
+    post pachinko_entry_path, params: { ball_id: "core-owned-ball" }, as: :json
+    assert_response :success
+
+    post pachinko_consume_path, params: { draw: false }, as: :json
+
+    assert_response :success
+    assert_equal true, response.parsed_body["consumed"]
+    assert_equal 0, response.parsed_body["hold_count"]
+    assert_nil response.parsed_body["result"]
+  end
+
   test "does not consume when there are no holds" do
     post pachinko_consume_path, as: :json
 

@@ -1,7 +1,7 @@
 require "test_helper"
 
 class HomeControllerTest < ActionDispatch::IntegrationTest
-  test "renders the board, sample game data, and unconnected controls" do
+  test "renders the board, live game dashboard, and unconnected controls" do
     get root_path
 
     assert_response :success
@@ -38,12 +38,34 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select "#lcd-holds i", count: 4
     assert_select ".board-callout", count: 6
     assert_select ".money-grid div", count: 4
+    assert_select "#current-balls"
+    assert_select "#invested-yen"
+    assert_select "#payout-balls"
+    assert_select "#difference-balls"
+    assert_select "#balance-yen"
     assert_select ".stat-grid div", count: 7
-    assert_select ".history-list li", count: 3
+    assert_select "#normal-spins"
+    assert_select "#st-spins"
+    assert_select "#first-hits"
+    assert_select "#lush-entries"
+    assert_select "#current-streak"
+    assert_select "#max-streak"
+    assert_select "#launched-balls"
+    assert_select "#balance-chart-panel"
+    assert_select "#balance-chart-line"
+    assert_select "#balance-chart-area"
+    assert_select "#balance-chart-zero"
+    assert_select "#balance-chart-current"
+    assert_select ".history-list li.history-empty", count: 1
+    assert_select "#jackpot-history"
+    assert_select "#jackpot-count", text: "0"
+    assert_select ".live-tag", text: "LIVE"
+    assert_select "body", text: /SAMPLE/, count: 0
     assert_select ".strength-button", count: 2
     assert_select "button[data-launch-mode='left']", text: "左打ち"
     assert_select "button[data-launch-mode='right']", text: "右打ち"
     assert_select ".action-button", count: 4
+    assert_select "button[data-simulation-action='invest']", count: 1
     assert_select "fieldset[disabled]", count: 0
     assert_select "input[type='range'][id='launch-power']", count: 0
     assert_select "input[type='number'][id='target-hit-rate']", count: 1
@@ -64,5 +86,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select "body", /LUSH突入/
     assert_select "body", /最高連チャン/
     assert_select "body", /累計打ち出し数/
+    assert_select "body", /収支の推移/
+    assert_select "body", /大当たりデータ/
   end
 end

@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "original-machine",
+  "name": "ORBIT-01",
+  "holdLimit": 4,
+  "lottery": {
+    "normal": {
+      "jackpotNumerator": 1,
+      "jackpotDenominator": 399
+    }
+  },
+  "payout": {
+    "jackpotBalls": 1500,
+    "roundCount": 10
+  },
+  "states": {
+    "st": {
+      "enabled": false,
+      "spins": 0,
+      "continuationRate": 0
+    },
+    "lush": {
+      "enabled": false,
+      "spins": 0
+    }
+  }
+}

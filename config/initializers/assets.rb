@@ -9,3 +9,10 @@ javascript_assets_path = Rails.root.join("app/assets/javascripts")
 unless Rails.application.config.assets.paths.include?(javascript_assets_path)
   Rails.application.config.assets.paths << javascript_assets_path
 end
+
+# Vite output for the TypeScript game core (src/integration/browserAdapter.ts).
+# The bundle is served by Propshaft like the existing legacy scripts.
+builds_assets_path = Rails.root.join("app/assets/builds")
+unless Rails.application.config.assets.paths.include?(builds_assets_path)
+  Rails.application.config.assets.paths << builds_assets_path
+end

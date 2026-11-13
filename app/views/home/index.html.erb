@@ -7,43 +7,61 @@
         <h1>ORBIT <span>遊技シミュレーター</span></h1>
       </div>
     </div>
-    <div class="session-chip"><span class="status-dot"></span> SESSION ONLY <span class="chip-divider">|</span> SAMPLE DATA</div>
+    <div class="session-chip"><span class="status-dot"></span> SESSION ONLY <span class="chip-divider">|</span> <span id="session-chip-data">LIVE DATA</span></div>
   </header>
 
   <div class="game-layout">
     <aside class="data-sidebar" aria-label="遊技情報">
       <section class="data-panel balance-panel">
-        <header class="panel-heading"><div><span class="panel-kicker">PLAY DATA</span><h2>遊技情報</h2></div><span class="sample-tag">SAMPLE</span></header>
-        <div class="main-balance"><span>現在の持ち玉</span><strong>4,250<small>玉</small></strong></div>
+        <header class="panel-heading"><div><span class="panel-kicker">PLAY DATA</span><h2>遊技情報</h2></div><span class="sample-tag live-tag">LIVE</span></header>
+        <div class="main-balance"><span>現在の持ち玉</span><strong><span id="current-balls">750</span><small>玉</small></strong></div>
         <dl class="money-grid">
-          <div><dt>投資額</dt><dd>¥3,000</dd></div>
-          <div><dt>累計払出</dt><dd>1,240<small>玉</small></dd></div>
-          <div><dt>差玉</dt><dd class="positive">+1,240<small>玉</small></dd></div>
-          <div><dt>収支</dt><dd class="negative">−¥1,760</dd></div>
+          <div><dt>投資額</dt><dd><span id="invested-yen">¥3,000</span></dd></div>
+          <div><dt>累計払出</dt><dd><span id="payout-balls">0</span><small>玉</small></dd></div>
+          <div><dt>差玉</dt><dd id="difference-balls-cell"><span id="difference-balls">±0</span><small>玉</small></dd></div>
+          <div><dt>収支</dt><dd id="balance-yen-cell"><span id="balance-yen">±¥0</span></dd></div>
         </dl>
+        <p class="panel-note">持ち玉 = 投資玉 + 払出 − 打ち出し／収支 = 差玉 × 4円</p>
       </section>
 
       <section class="data-panel session-panel">
         <header class="panel-heading"><div><span class="panel-kicker">SESSION</span><h2>遊技データ</h2></div></header>
         <dl class="stat-grid">
-          <div><dt>通常回転数</dt><dd>124<small>回</small></dd></div>
-          <div><dt>ST回転数</dt><dd>0<small>回</small></dd></div>
-          <div><dt>初当たり</dt><dd>2<small>回</small></dd></div>
-          <div><dt>LUSH突入</dt><dd>1<small>回</small></dd></div>
-          <div><dt>連チャン</dt><dd>0<small>回</small></dd></div>
-          <div><dt>最高連チャン</dt><dd>6<small>回</small></dd></div>
-          <div class="stat-wide"><dt>累計打ち出し数</dt><dd>1,620<small>玉</small></dd></div>
+          <div><dt>通常回転数</dt><dd><span id="normal-spins">0</span><small>回</small></dd></div>
+          <div><dt>ST回転数</dt><dd><span id="st-spins">0</span><small>回</small></dd></div>
+          <div><dt>初当たり</dt><dd><span id="first-hits">0</span><small>回</small></dd></div>
+          <div><dt>LUSH突入</dt><dd><span id="lush-entries">0</span><small>回</small></dd></div>
+          <div><dt>連チャン</dt><dd><span id="current-streak">0</span><small>回</small></dd></div>
+          <div><dt>最高連チャン</dt><dd><span id="max-streak">0</span><small>回</small></dd></div>
+          <div class="stat-wide"><dt>累計打ち出し数</dt><dd><span id="launched-balls">0</span><small>玉</small></dd></div>
         </dl>
       </section>
 
+      <section class="data-panel chart-panel" id="balance-chart-panel">
+        <header class="panel-heading"><div><span class="panel-kicker">BALANCE</span><h2>収支の推移</h2></div><span class="chart-points" id="balance-chart-points">±¥0</span></header>
+        <div class="chart-summary"><strong id="balance-chart-current">±¥0</strong><span>差玉 × 4円</span></div>
+        <svg class="balance-chart" viewBox="0 0 220 92" role="img" aria-labelledby="balance-chart-title">
+          <title id="balance-chart-title">収支の折れ線グラフ</title>
+          <defs>
+            <linearGradient id="balance-chart-fill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#63e9ee" stop-opacity="0.28"></stop>
+              <stop offset="100%" stop-color="#63e9ee" stop-opacity="0"></stop>
+            </linearGradient>
+          </defs>
+          <line class="chart-zero-line" id="balance-chart-zero" x1="6" y1="46" x2="214" y2="46"></line>
+          <path class="chart-area" id="balance-chart-area" d=""></path>
+          <path class="chart-line" id="balance-chart-line" d=""></path>
+          <circle class="chart-dot" id="balance-chart-dot" cx="6" cy="46" r="2.6"></circle>
+        </svg>
+        <div class="chart-axis"><span>開始</span><span>現在</span></div>
+      </section>
+
       <section class="data-panel history-panel">
-        <header class="panel-heading"><div><span class="panel-kicker">HISTORY</span><h2>大当たり履歴</h2></div><span class="history-count">3</span></header>
-        <ol class="history-list">
-          <li><time>10:42</time><span class="history-type">10R</span><span class="history-mode">LUSH</span></li>
-          <li><time>10:28</time><span class="history-type">3R</span><span class="history-mode">通常</span></li>
-          <li><time>10:04</time><span class="history-type">7R</span><span class="history-mode">初当たり</span></li>
+        <header class="panel-heading"><div><span class="panel-kicker">HISTORY</span><h2>大当たりデータ</h2></div><span class="history-count" id="jackpot-count">0</span></header>
+        <ol class="history-list" id="jackpot-history">
+          <li class="history-empty">まだ大当たりはありません</li>
         </ol>
-        <p class="sample-note">数値・履歴は画面用の仮データです。</p>
+        <p class="panel-note">セッション中に成立した大当たりを新しい順に表示します。</p>
       </section>
     </aside>
 
@@ -73,10 +91,10 @@
             <button type="button" class="action-button stop-button" data-simulation-action="stop">■ <span>打ち出し停止</span></button>
             <button type="button" class="action-button" data-simulation-action="pause">Ⅱ <span>一時停止・再開</span></button>
             <button type="button" class="action-button" data-simulation-action="reset">↻ <span>リセット</span></button>
-            <button type="button" class="action-button investment-button">＋ <span>追加投資</span></button>
+            <button type="button" class="action-button investment-button" data-simulation-action="invest">＋ <span>追加投資</span></button>
           </div>
         </fieldset>
-        <p id="controls-note" class="controls-note">自動で玉を発射します。左打ち・右打ちを切り替えられます。ヘソ入賞で抽選し、保留上限は4個です。</p>
+        <p id="controls-note" class="controls-note">自動で玉を発射します。左打ち・右打ちを切り替えられます。ヘソ入賞で抽選し、保留上限は4個です。追加投資は¥1,000（250玉）単位です。</p>
 
         <details class="physics-calibration">
           <summary>物理検証・入賞率</summary>
